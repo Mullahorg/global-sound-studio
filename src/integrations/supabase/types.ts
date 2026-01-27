@@ -157,6 +157,39 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       conversation_participants: {
         Row: {
           conversation_id: string
@@ -577,7 +610,9 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          phone: string | null
           region: string | null
+          social_links: Json | null
           updated_at: string
         }
         Insert: {
@@ -590,7 +625,9 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          phone?: string | null
           region?: string | null
+          social_links?: Json | null
           updated_at?: string
         }
         Update: {
@@ -603,7 +640,9 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          phone?: string | null
           region?: string | null
+          social_links?: Json | null
           updated_at?: string
         }
         Relationships: []
