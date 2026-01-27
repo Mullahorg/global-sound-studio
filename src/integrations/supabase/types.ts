@@ -254,6 +254,182 @@ export type Database = {
           },
         ]
       }
+      earnings: {
+        Row: {
+          beat_id: string | null
+          created_at: string
+          currency: string
+          gross_amount: number
+          id: string
+          net_amount: number
+          order_id: string | null
+          payout_id: string | null
+          platform_fee: number
+          producer_id: string
+          status: string
+        }
+        Insert: {
+          beat_id?: string | null
+          created_at?: string
+          currency?: string
+          gross_amount: number
+          id?: string
+          net_amount: number
+          order_id?: string | null
+          payout_id?: string | null
+          platform_fee?: number
+          producer_id: string
+          status?: string
+        }
+        Update: {
+          beat_id?: string | null
+          created_at?: string
+          currency?: string
+          gross_amount?: number
+          id?: string
+          net_amount?: number
+          order_id?: string | null
+          payout_id?: string | null
+          platform_fee?: number
+          producer_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "earnings_beat_id_fkey"
+            columns: ["beat_id"]
+            isOneToOne: false
+            referencedRelation: "beats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "earnings_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "earnings_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "payouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      licenses: {
+        Row: {
+          beat_id: string
+          commercial_use: boolean | null
+          created_at: string
+          distribution_copies: number | null
+          features: Json | null
+          file_types: string[] | null
+          id: string
+          license_type: string
+          price: number
+          stems_included: boolean | null
+          streaming_limit: number | null
+          updated_at: string
+        }
+        Insert: {
+          beat_id: string
+          commercial_use?: boolean | null
+          created_at?: string
+          distribution_copies?: number | null
+          features?: Json | null
+          file_types?: string[] | null
+          id?: string
+          license_type: string
+          price?: number
+          stems_included?: boolean | null
+          streaming_limit?: number | null
+          updated_at?: string
+        }
+        Update: {
+          beat_id?: string
+          commercial_use?: boolean | null
+          created_at?: string
+          distribution_copies?: number | null
+          features?: Json | null
+          file_types?: string[] | null
+          id?: string
+          license_type?: string
+          price?: number
+          stems_included?: boolean | null
+          streaming_limit?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_beat_id_fkey"
+            columns: ["beat_id"]
+            isOneToOne: false
+            referencedRelation: "beats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manual_payments: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          order_id: string | null
+          proof_file_name: string | null
+          proof_url: string | null
+          reference_code: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          order_id?: string | null
+          proof_file_name?: string | null
+          proof_url?: string | null
+          reference_code: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          order_id?: string | null
+          proof_file_name?: string | null
+          proof_url?: string | null
+          reference_code?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manual_payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -297,6 +473,62 @@ export type Database = {
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          amount: number
+          beat_id: string | null
+          created_at: string
+          currency: string
+          download_expires_at: string | null
+          download_url: string | null
+          id: string
+          license_type: string
+          order_number: string
+          payment_method: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          beat_id?: string | null
+          created_at?: string
+          currency?: string
+          download_expires_at?: string | null
+          download_url?: string | null
+          id?: string
+          license_type: string
+          order_number?: string
+          payment_method?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          beat_id?: string | null
+          created_at?: string
+          currency?: string
+          download_expires_at?: string | null
+          download_url?: string | null
+          id?: string
+          license_type?: string
+          order_number?: string
+          payment_method?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_beat_id_fkey"
+            columns: ["beat_id"]
+            isOneToOne: false
+            referencedRelation: "beats"
             referencedColumns: ["id"]
           },
         ]
@@ -729,6 +961,100 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          beat_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          is_verified_purchase: boolean | null
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          beat_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          is_verified_purchase?: boolean | null
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          beat_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          is_verified_purchase?: boolean | null
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_beat_id_fkey"
+            columns: ["beat_id"]
+            isOneToOne: false
+            referencedRelation: "beats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          metadata: Json | null
+          mpesa_receipt_number: string | null
+          order_id: string | null
+          payment_method: string
+          phone_number: string | null
+          status: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          mpesa_receipt_number?: string | null
+          order_id?: string | null
+          payment_method?: string
+          phone_number?: string | null
+          status?: string
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          mpesa_receipt_number?: string | null
+          order_id?: string | null
+          payment_method?: string
+          phone_number?: string | null
+          status?: string
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

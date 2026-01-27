@@ -42,6 +42,8 @@ import { OutreachPanel } from "@/components/admin/OutreachPanel";
 import { PayoutsPanel } from "@/components/admin/PayoutsPanel";
 import { AnalyticsPanel } from "@/components/admin/AnalyticsPanel";
 import { ContentPanel } from "@/components/admin/ContentPanel";
+import { OrdersPanel } from "@/components/admin/OrdersPanel";
+import { ManualPaymentsPanel } from "@/components/admin/ManualPaymentsPanel";
 
 interface Beat {
   id: string;
@@ -298,7 +300,9 @@ const Admin = () => {
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "beats", label: "Beats CMS", icon: Music },
     { id: "bookings", label: "Bookings", icon: Calendar },
+    { id: "orders", label: "Orders", icon: FileText },
     { id: "payments", label: "Payments", icon: CreditCard },
+    { id: "manual-payments", label: "Manual Verify", icon: Wallet },
     { id: "payouts", label: "Payouts", icon: Wallet },
     { id: "users", label: "Users", icon: Users },
     { id: "outreach", label: "Outreach", icon: Rocket },
@@ -659,8 +663,14 @@ const Admin = () => {
             </motion.div>
           )}
 
+          {/* Orders Tab */}
+          {activeTab === "orders" && <OrdersPanel />}
+
           {/* Payments Tab */}
           {activeTab === "payments" && <PaymentsPanel />}
+
+          {/* Manual Payments Tab */}
+          {activeTab === "manual-payments" && <ManualPaymentsPanel />}
 
           {/* Payouts Tab */}
           {activeTab === "payouts" && (

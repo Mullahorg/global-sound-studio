@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Phone, Loader2, CheckCircle, XCircle, AlertCircle, Banknote } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { PaybillBackupDialog } from "./PaybillBackupDialog";
 
 interface MpesaCheckoutDialogProps {
   open: boolean;
@@ -35,6 +36,7 @@ export const MpesaCheckoutDialog = ({
   const [status, setStatus] = useState<PaymentStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
+  const [showPaybillBackup, setShowPaybillBackup] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -281,25 +283,46 @@ export const MpesaCheckoutDialog = ({
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="py-12 text-center"
+              className="py-8 text-center"
             >
               <div className="w-16 h-16 rounded-full bg-destructive/20 flex items-center justify-center mx-auto mb-4">
                 <XCircle className="w-10 h-10 text-destructive" />
               </div>
               <h3 className="font-display font-semibold text-xl mb-2">Payment Failed</h3>
               <p className="text-muted-foreground mb-6">{errorMessage}</p>
-              <div className="flex gap-3 justify-center">
-                <Button variant="outline" onClick={() => onOpenChange(false)}>
-                  Cancel
+              
+              <div className="space-y-3">
+                <Button variant="hero" onClick={() => setStatus("idle")} className="w-full">
+                  Try M-Pesa Again
                 </Button>
-                <Button variant="hero" onClick={() => setStatus("idle")}>
-                  Try Again
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    onOpenChange(false);
+                    setShowPaybillBackup(true);
+                  }}
+                  className="w-full"
+                >
+                  <Banknote className="w-4 h-4 mr-2" />
+                  Pay via Paybill Instead
+                </Button>
+                <Button variant="ghost" onClick={() => onOpenChange(false)} className="w-full">
+                  Cancel
                 </Button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </DialogContent>
+
+      {/* Paybill Backup Dialog */}
+      <PaybillBackupDialog
+        open={showPaybillBackup}
+        onOpenChange={setShowPaybillBackup}
+        amount={amount}
+        orderId={referenceId}
+        onSuccess={onSuccess}
+      />
     </Dialog>
   );
 };
