@@ -28,6 +28,9 @@ import Terms from "./pages/Terms";
 import Licensing from "./pages/Licensing";
 import Support from "./pages/Support";
 import Chat from "./pages/Chat";
+import Profile from "./pages/Profile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -72,6 +75,9 @@ const App = () => (
                 <Route path="/licensing" element={<Licensing />} />
                 <Route path="/support" element={<Support />} />
                 <Route path="/chat" element={<Chat />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
