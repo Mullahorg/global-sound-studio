@@ -112,6 +112,63 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_earnings: {
+        Row: {
+          booking_id: string
+          commission_rate: number
+          created_at: string | null
+          gross_amount: number
+          id: string
+          net_amount: number
+          payout_id: string | null
+          platform_fee: number
+          producer_id: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          booking_id: string
+          commission_rate?: number
+          created_at?: string | null
+          gross_amount: number
+          id?: string
+          net_amount: number
+          payout_id?: string | null
+          platform_fee?: number
+          producer_id: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          booking_id?: string
+          commission_rate?: number
+          created_at?: string | null
+          gross_amount?: number
+          id?: string
+          net_amount?: number
+          payout_id?: string | null
+          platform_fee?: number
+          producer_id?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_earnings_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_earnings_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "payouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           client_id: string
@@ -831,6 +888,72 @@ export type Database = {
           },
         ]
       }
+      producer_settings: {
+        Row: {
+          available_days: Json | null
+          available_hours: Json | null
+          bank_account: string | null
+          bank_name: string | null
+          bio_short: string | null
+          booking_enabled: boolean | null
+          commission_rate: number | null
+          created_at: string | null
+          hourly_rate: number | null
+          id: string
+          is_franchise_active: boolean | null
+          minimum_payout: number | null
+          mpesa_number: string | null
+          payout_method: string | null
+          portfolio_url: string | null
+          producer_id: string
+          specializations: string[] | null
+          updated_at: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          available_days?: Json | null
+          available_hours?: Json | null
+          bank_account?: string | null
+          bank_name?: string | null
+          bio_short?: string | null
+          booking_enabled?: boolean | null
+          commission_rate?: number | null
+          created_at?: string | null
+          hourly_rate?: number | null
+          id?: string
+          is_franchise_active?: boolean | null
+          minimum_payout?: number | null
+          mpesa_number?: string | null
+          payout_method?: string | null
+          portfolio_url?: string | null
+          producer_id: string
+          specializations?: string[] | null
+          updated_at?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          available_days?: Json | null
+          available_hours?: Json | null
+          bank_account?: string | null
+          bank_name?: string | null
+          bio_short?: string | null
+          booking_enabled?: boolean | null
+          commission_rate?: number | null
+          created_at?: string | null
+          hourly_rate?: number | null
+          id?: string
+          is_franchise_active?: boolean | null
+          minimum_payout?: number | null
+          mpesa_number?: string | null
+          payout_method?: string | null
+          portfolio_url?: string | null
+          producer_id?: string
+          specializations?: string[] | null
+          updated_at?: string | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -961,6 +1084,136 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          reward_per_referral: number | null
+          updated_at: string | null
+          user_id: string
+          uses_count: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          reward_per_referral?: number | null
+          updated_at?: string | null
+          user_id: string
+          uses_count?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          reward_per_referral?: number | null
+          updated_at?: string | null
+          user_id?: string
+          uses_count?: number | null
+        }
+        Relationships: []
+      }
+      referral_rewards: {
+        Row: {
+          amount: number
+          claimed_at: string | null
+          created_at: string | null
+          description: string | null
+          expires_at: string | null
+          id: string
+          referral_id: string | null
+          reward_type: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          claimed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          referral_id?: string | null
+          reward_type: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          claimed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          referral_id?: string | null
+          reward_type?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_rewards_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          created_at: string | null
+          id: string
+          qualification_type: string | null
+          referral_code_id: string | null
+          referred_id: string
+          referrer_id: string
+          reward_amount: number | null
+          reward_paid_at: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          qualification_type?: string | null
+          referral_code_id?: string | null
+          referred_id: string
+          referrer_id: string
+          reward_amount?: number | null
+          reward_paid_at?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          qualification_type?: string | null
+          referral_code_id?: string | null
+          referred_id?: string
+          referrer_id?: string
+          reward_amount?: number | null
+          reward_paid_at?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {

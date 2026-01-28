@@ -23,7 +23,9 @@ import {
   X,
   CreditCard,
   Rocket,
-  Wallet
+  Wallet,
+  Gift,
+  Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +46,8 @@ import { AnalyticsPanel } from "@/components/admin/AnalyticsPanel";
 import { ContentPanel } from "@/components/admin/ContentPanel";
 import { OrdersPanel } from "@/components/admin/OrdersPanel";
 import { ManualPaymentsPanel } from "@/components/admin/ManualPaymentsPanel";
+import { ReferralsPanel } from "@/components/admin/ReferralsPanel";
+import { FranchisePanel } from "@/components/admin/FranchisePanel";
 
 interface Beat {
   id: string;
@@ -306,6 +310,8 @@ const Admin = () => {
     { id: "payouts", label: "Payouts", icon: Wallet },
     { id: "users", label: "Users", icon: Users },
     { id: "outreach", label: "Outreach", icon: Rocket },
+    { id: "referrals", label: "Referrals", icon: Gift },
+    { id: "franchise", label: "Franchise", icon: Building2 },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "content", label: "Content", icon: FileText },
     { id: "settings", label: "Settings", icon: Settings },
@@ -691,6 +697,22 @@ const Admin = () => {
 
           {/* Outreach Tab */}
           {activeTab === "outreach" && <OutreachPanel />}
+
+          {/* Referrals Tab */}
+          {activeTab === "referrals" && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <h2 className="font-display text-2xl font-semibold mb-6">Referral Program</h2>
+              <ReferralsPanel />
+            </motion.div>
+          )}
+
+          {/* Franchise Tab */}
+          {activeTab === "franchise" && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <h2 className="font-display text-2xl font-semibold mb-6">Producer Franchise</h2>
+              <FranchisePanel />
+            </motion.div>
+          )}
 
           {/* Settings Tab */}
           {activeTab === "settings" && <SettingsPanel />}
