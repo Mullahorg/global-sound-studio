@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { format, addDays, isSameDay, isAfter, startOfToday } from "date-fns";
-import { Calendar, Clock, User, ArrowRight, Check, ChevronLeft, ChevronRight, Smartphone } from "lucide-react";
+import { Calendar, Clock, User, ArrowRight, Check, ChevronLeft, ChevronRight, Smartphone, RefreshCw } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -13,55 +13,24 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MpesaCheckoutDialog } from "@/components/payments/MpesaCheckoutDialog";
 
-// Session prices in KES
-const sessionTypes = [
-  {
-    id: "recording",
-    name: "Recording Session",
-    description: "Professional vocal and instrument recording",
-    priceKES: 15000,
-    duration: 2,
-    icon: "🎤",
-  },
-  {
-    id: "mixing",
-    name: "Mixing Session",
-    description: "Full mix with engineer consultation",
-    priceKES: 20000,
-    duration: 3,
-    icon: "🎚️",
-  },
-  {
-    id: "mastering",
-    name: "Mastering",
-    description: "Final polish for release-ready tracks",
-    priceKES: 10000,
-    duration: 1,
-    icon: "💿",
-  },
-  {
-    id: "production",
-    name: "Production Session",
-    description: "Collaborative beat-making and production",
-    priceKES: 25000,
-    duration: 4,
-    icon: "🎹",
-  },
-  {
-    id: "consultation",
-    name: "Consultation",
-    description: "One-on-one career and music advice",
-    priceKES: 7500,
-    duration: 1,
-    icon: "💬",
-  },
-];
+interface SessionType {
+  id: string;
+  session_type: string;
+  name: string;
+  description: string | null;
+  price_kes: number;
+  duration_hours: number;
+  icon: string;
+  is_active: boolean;
+}
 
-const producers = [
-  { id: "1", name: "Marcus Chen", specialty: "Hip-Hop / R&B", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" },
-  { id: "2", name: "Sarah Williams", specialty: "Pop / Electronic", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" },
-  { id: "3", name: "David Okonkwo", specialty: "Afrobeats / World", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" },
-];
+interface Producer {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  bio_short: string | null;
+  hourly_rate: number | null;
+}
 
 const timeSlots = [
   "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"
@@ -78,13 +47,73 @@ const Booking = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMpesaDialog, setShowMpesaDialog] = useState(false);
   const [createdBookingId, setCreatedBookingId] = useState<string | null>(null);
+  const [sessionTypes, setSessionTypes] = useState<SessionType[]>([]);
+  const [producers, setProducers] = useState<Producer[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    // Fetch session pricing from database
+    const { data: pricingData } = await supabase
+      .from("session_pricing")
+      .select("*")
+      .eq("is_active", true)
+      .order("price_kes", { ascending: true });
+
+    if (pricingData) {
+      setSessionTypes(pricingData.map(p => ({
+        id: p.session_type,
+        session_type: p.session_type,
+        name: p.name,
+        description: p.description,
+        price_kes: Number(p.price_kes),
+        duration_hours: p.duration_hours,
+        icon: p.icon || "🎵",
+        is_active: p.is_active,
+      })));
+    }
+
+    // Fetch active franchise producers
+    const { data: producerSettings } = await supabase
+      .from("producer_settings")
+      .select("producer_id, bio_short, hourly_rate")
+      .eq("is_franchise_active", true)
+      .eq("booking_enabled", true);
+
+    if (producerSettings && producerSettings.length > 0) {
+      const producerIds = producerSettings.map(p => p.producer_id);
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", producerIds);
+
+      if (profiles) {
+        const enrichedProducers = profiles.map(profile => {
+          const settings = producerSettings.find(s => s.producer_id === profile.id);
+          return {
+            id: profile.id,
+            full_name: profile.full_name,
+            avatar_url: profile.avatar_url,
+            bio_short: settings?.bio_short || null,
+            hourly_rate: settings?.hourly_rate || null,
+          };
+        });
+        setProducers(enrichedProducers);
+      }
+    }
+
+    setLoading(false);
+  };
+
   const selectedSessionData = sessionTypes.find(s => s.id === selectedSession);
-  const totalPrice = (selectedSessionData?.priceKES || 0) * (selectedSessionData?.duration || 1);
+  const totalPrice = (selectedSessionData?.price_kes || 0) * (selectedSessionData?.duration_hours || 1);
   const selectedProducerData = producers.find(p => p.id === selectedProducer);
 
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(calendarWeekStart, i));
@@ -111,7 +140,7 @@ const Booking = () => {
         session_type: selectedSession as "recording" | "mixing" | "mastering" | "production" | "consultation",
         session_date: format(selectedDate, "yyyy-MM-dd"),
         start_time: selectedTime,
-        duration_hours: selectedSessionData?.duration || 2,
+        duration_hours: selectedSessionData?.duration_hours || 2,
         total_price: totalPrice,
         notes: notes || null,
         status: "pending",
@@ -152,9 +181,14 @@ const Booking = () => {
       />
       <Navbar />
       
-      <main className="pt-24 pb-16">
-        <div className="container mx-auto px-6">
-          {/* Header */}
+      {loading ? (
+        <div className="min-h-screen flex items-center justify-center">
+          <RefreshCw className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <main className="pt-24 pb-16">
+          <div className="container mx-auto px-6">
+            {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -216,9 +250,9 @@ const Booking = () => {
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-muted-foreground">
                               <Clock className="w-4 h-4 inline mr-1" />
-                              {session.duration}h
+                              {session.duration_hours}h
                             </span>
-                            <span className="font-display font-bold text-primary">KES {session.priceKES.toLocaleString()}/hr</span>
+                            <span className="font-display font-bold text-primary">KES {session.price_kes.toLocaleString()}/hr</span>
                           </div>
                         </div>
                       </div>
@@ -236,7 +270,7 @@ const Booking = () => {
               >
                 <h2 className="font-display text-2xl font-semibold mb-6">Select Producer (Optional)</h2>
                 <div className="grid md:grid-cols-3 gap-4 mb-6">
-                  {producers.map((producer) => (
+                  {producers.length > 0 ? producers.map((producer) => (
                     <button
                       key={producer.id}
                       onClick={() => setSelectedProducer(producer.id)}
@@ -247,14 +281,18 @@ const Booking = () => {
                       }`}
                     >
                       <img
-                        src={producer.avatar}
-                        alt={producer.name}
+                        src={producer.avatar_url || "https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=100&h=100&fit=crop&crop=face"}
+                        alt={producer.full_name || "Producer"}
                         className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
                       />
-                      <h3 className="font-display font-semibold mb-1">{producer.name}</h3>
-                      <p className="text-sm text-muted-foreground">{producer.specialty}</p>
+                      <h3 className="font-display font-semibold mb-1">{producer.full_name || "Producer"}</h3>
+                      <p className="text-sm text-muted-foreground">{producer.bio_short || "Music Producer"}</p>
                     </button>
-                  ))}
+                  )) : (
+                    <div className="col-span-3 text-center py-8 text-muted-foreground">
+                      <p>No producers available for selection</p>
+                    </div>
+                  )}
                 </div>
                 <Button
                   variant="ghost"
@@ -367,7 +405,7 @@ const Booking = () => {
                     {selectedProducerData && (
                       <div className="flex items-center justify-between py-3 border-b border-border/50">
                         <span className="text-muted-foreground">Producer</span>
-                        <span className="font-semibold">{selectedProducerData.name}</span>
+                        <span className="font-semibold">{selectedProducerData.full_name}</span>
                       </div>
                     )}
                     <div className="flex items-center justify-between py-3 border-b border-border/50">
@@ -382,7 +420,7 @@ const Booking = () => {
                     </div>
                     <div className="flex items-center justify-between py-3 border-b border-border/50">
                       <span className="text-muted-foreground">Duration</span>
-                      <span className="font-semibold">{selectedSessionData?.duration} hours</span>
+                      <span className="font-semibold">{selectedSessionData?.duration_hours} hours</span>
                     </div>
                     <div className="flex items-center justify-between py-3">
                       <span className="text-muted-foreground">Total</span>
@@ -443,6 +481,7 @@ const Booking = () => {
           </div>
         </div>
       </main>
+      )}
 
       <Footer />
 

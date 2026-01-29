@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcements: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          ends_at: string | null
+          id: string
+          is_active: boolean | null
+          message: string
+          starts_at: string | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          message: string
+          starts_at?: string | null
+          title: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          message?: string
+          starts_at?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       beat_purchases: {
         Row: {
           beat_id: string
@@ -1255,6 +1294,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      session_pricing: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_hours: number
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          price_kes: number
+          session_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_hours?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          price_kes?: number
+          session_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_hours?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          price_kes?: number
+          session_type?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       transactions: {
         Row: {
