@@ -9,6 +9,7 @@ import { OutreachSection } from "@/components/home/OutreachSection";
 import { FAQSection } from "@/components/home/FAQSection";
 import { Footer } from "@/components/layout/Footer";
 import { PageMeta } from "@/components/seo/PageMeta";
+import { AnnouncementBanner } from "@/components/home/AnnouncementBanner";
 
 const Index = () => {
   return (
@@ -20,6 +21,9 @@ const Index = () => {
       />
       <Navbar />
       <main>
+        <div className="container mx-auto px-6 pt-24">
+          <AnnouncementBanner />
+        </div>
         <HeroSection />
         <TrustedBySection />
         <ServicesSection />
