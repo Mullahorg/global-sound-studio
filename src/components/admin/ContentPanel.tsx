@@ -54,11 +54,16 @@ interface SiteSettings {
   site_name: string;
   hero_title: string;
   hero_subtitle: string;
+  hero_badge: string;
   contact_email: string;
   contact_phone: string;
   studio_description: string;
   commission_rate: string;
   minimum_payout: string;
+  stat_projects: string;
+  stat_artists: string;
+  stat_nominations: string;
+  stat_access: string;
 }
 
 export const ContentPanel = () => {
@@ -76,11 +81,16 @@ export const ContentPanel = () => {
     site_name: "",
     hero_title: "",
     hero_subtitle: "",
+    hero_badge: "",
     contact_email: "",
     contact_phone: "",
     studio_description: "",
     commission_rate: "30",
     minimum_payout: "1000",
+    stat_projects: "500+",
+    stat_artists: "120+",
+    stat_nominations: "50+",
+    stat_access: "24/7",
   });
 
   const [newAnnouncement, setNewAnnouncement] = useState({
@@ -126,11 +136,16 @@ export const ContentPanel = () => {
         site_name: settings.site_name || "",
         hero_title: settings.hero_title || "",
         hero_subtitle: settings.hero_subtitle || "",
+        hero_badge: settings.hero_badge || "",
         contact_email: settings.contact_email || "",
         contact_phone: settings.contact_phone || "",
         studio_description: settings.studio_description || "",
         commission_rate: settings.commission_rate || "30",
         minimum_payout: settings.minimum_payout || "1000",
+        stat_projects: settings.stat_projects || "500+",
+        stat_artists: settings.stat_artists || "120+",
+        stat_nominations: settings.stat_nominations || "50+",
+        stat_access: settings.stat_access || "24/7",
       });
     }
 
@@ -413,11 +428,20 @@ export const ContentPanel = () => {
                 />
               </div>
               <div>
+                <Label>Hero Badge Text</Label>
+                <Input
+                  value={siteContent.hero_badge}
+                  onChange={(e) => setSiteContent({ ...siteContent, hero_badge: e.target.value })}
+                  placeholder="World-Class Production Studio"
+                  className="mt-1"
+                />
+              </div>
+              <div>
                 <Label>Hero Title</Label>
                 <Input
                   value={siteContent.hero_title}
                   onChange={(e) => setSiteContent({ ...siteContent, hero_title: e.target.value })}
-                  placeholder="Main headline text"
+                  placeholder="Global Sound. One Studio."
                   className="mt-1"
                 />
               </div>
@@ -429,6 +453,44 @@ export const ContentPanel = () => {
                   placeholder="Supporting text below headline"
                   className="mt-1"
                 />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                  <Label>Projects Stat</Label>
+                  <Input
+                    value={siteContent.stat_projects}
+                    onChange={(e) => setSiteContent({ ...siteContent, stat_projects: e.target.value })}
+                    placeholder="500+"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label>Artists Stat</Label>
+                  <Input
+                    value={siteContent.stat_artists}
+                    onChange={(e) => setSiteContent({ ...siteContent, stat_artists: e.target.value })}
+                    placeholder="120+"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label>Nominations Stat</Label>
+                  <Input
+                    value={siteContent.stat_nominations}
+                    onChange={(e) => setSiteContent({ ...siteContent, stat_nominations: e.target.value })}
+                    placeholder="50+"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label>Access Stat</Label>
+                  <Input
+                    value={siteContent.stat_access}
+                    onChange={(e) => setSiteContent({ ...siteContent, stat_access: e.target.value })}
+                    placeholder="24/7"
+                    className="mt-1"
+                  />
+                </div>
               </div>
               <div>
                 <Label>Studio Description</Label>

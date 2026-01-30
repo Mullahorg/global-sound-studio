@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Play, ArrowRight, Sparkles, Disc3, Music2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WaveformVisualizer } from "@/components/ui/WaveformVisualizer";
+import { usePlatformSettings } from "@/hooks/usePlatformSettings";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Floating particles component
 const FloatingParticles = () => {
@@ -46,6 +47,13 @@ const FloatingParticles = () => {
 };
 
 export const HeroSection = () => {
+  const { settings, loading } = usePlatformSettings();
+
+  // Parse hero title for styling (split on period for two-line display)
+  const titleParts = settings.hero_title.split(". ");
+  const firstPart = titleParts[0] || "Global Sound";
+  const secondPart = titleParts[1]?.replace(".", "") || "One Studio";
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Background Elements */}
@@ -66,17 +74,17 @@ export const HeroSection = () => {
 
       {/* Glow Orbs */}
       <motion.div 
-        className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/15 rounded-full blur-[150px]"
+        className="absolute top-1/4 left-1/4 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-primary/15 rounded-full blur-[100px] md:blur-[150px]"
         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 8, repeat: Infinity }}
       />
       <motion.div 
-        className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent/15 rounded-full blur-[120px]"
+        className="absolute bottom-1/4 right-1/4 w-[250px] md:w-[400px] h-[250px] md:h-[400px] bg-accent/15 rounded-full blur-[80px] md:blur-[120px]"
         animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 6, repeat: Infinity }}
       />
 
-      {/* Floating Music Icons */}
+      {/* Floating Music Icons - Hidden on mobile */}
       <motion.div
         className="absolute top-32 right-20 text-primary/10 hidden lg:block"
         animate={{ y: [0, -30, 0], rotate: [0, 15, 0] }}
@@ -92,14 +100,14 @@ export const HeroSection = () => {
         <Music2 className="w-20 h-20" />
       </motion.div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="max-w-5xl mx-auto text-center">
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass border border-primary/20 mb-8"
+            className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass border border-primary/20 mb-6 sm:mb-8"
           >
             <motion.div
               animate={{ rotate: 360 }}
@@ -107,7 +115,11 @@ export const HeroSection = () => {
             >
               <Sparkles className="w-4 h-4 text-accent" />
             </motion.div>
-            <span className="text-sm text-foreground/80 font-medium">World-Class Production Studio</span>
+            {loading ? (
+              <Skeleton className="h-4 w-32" />
+            ) : (
+              <span className="text-xs sm:text-sm text-foreground/80 font-medium">{settings.hero_badge}</span>
+            )}
           </motion.div>
 
           {/* Main Heading */}
@@ -115,17 +127,26 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="font-display text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] mb-6"
+            className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] mb-4 sm:mb-6"
           >
-            <span className="text-foreground">Global Sound.</span>
-            <br />
-            <motion.span 
-              className="gradient-text inline-block"
-              animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-              transition={{ duration: 5, repeat: Infinity }}
-            >
-              One Studio.
-            </motion.span>
+            {loading ? (
+              <>
+                <Skeleton className="h-12 sm:h-16 md:h-20 w-3/4 mx-auto mb-2" />
+                <Skeleton className="h-12 sm:h-16 md:h-20 w-1/2 mx-auto" />
+              </>
+            ) : (
+              <>
+                <span className="text-foreground">{firstPart}.</span>
+                <br />
+                <motion.span 
+                  className="gradient-text inline-block"
+                  animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+                  transition={{ duration: 5, repeat: Infinity }}
+                >
+                  {secondPart}.
+                </motion.span>
+              </>
+            )}
           </motion.h1>
 
           {/* Subtitle */}
@@ -133,10 +154,13 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed"
+            className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-12 leading-relaxed px-4"
           >
-            A borderless ecosystem connecting artists, producers, labels, and brands 
-            through world-class music production. Your vision, our craft.
+            {loading ? (
+              <Skeleton className="h-6 w-full" />
+            ) : (
+              settings.hero_subtitle
+            )}
           </motion.p>
 
           {/* CTA Buttons */}
@@ -144,30 +168,30 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 px-4"
           >
-            <Link to="/beats">
-              <Button variant="hero" size="xl" className="group relative overflow-hidden">
-                <span className="relative z-10 flex items-center">
-                  <Play className="w-5 h-5 mr-2" />
+            <Link to="/beats" className="w-full sm:w-auto">
+              <Button variant="hero" size="lg" className="group relative overflow-hidden w-full sm:w-auto">
+                <span className="relative z-10 flex items-center justify-center">
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Explore Our Beats
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Button>
             </Link>
-            <Link to="/booking">
-              <Button variant="heroOutline" size="xl">
+            <Link to="/booking" className="w-full sm:w-auto">
+              <Button variant="heroOutline" size="lg" className="w-full sm:w-auto">
                 Book a Session
               </Button>
             </Link>
           </motion.div>
 
-          {/* Waveform Visualizer */}
+          {/* Waveform Visualizer - Hidden on small mobile */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.7 }}
-            className="relative"
+            className="relative hidden sm:block"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent rounded-2xl" />
             <WaveformVisualizer />
@@ -178,13 +202,13 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 pt-16 border-t border-border/30"
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 mt-12 sm:mt-16 pt-8 sm:pt-16 border-t border-border/30"
           >
             {[
-              { value: "500+", label: "Projects Delivered" },
-              { value: "120+", label: "Global Artists" },
-              { value: "50+", label: "Grammy Nominations" },
-              { value: "24/7", label: "Studio Access" },
+              { value: settings.stat_projects, label: "Projects Delivered" },
+              { value: settings.stat_artists, label: "Global Artists" },
+              { value: settings.stat_nominations, label: "Grammy Nominations" },
+              { value: settings.stat_access, label: "Studio Access" },
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -195,21 +219,21 @@ export const HeroSection = () => {
                 whileHover={{ scale: 1.05 }}
               >
                 <motion.div 
-                  className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2"
+                  className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-1 sm:mb-2"
                   whileHover={{ color: "hsl(var(--primary))" }}
                 >
-                  {stat.value}
+                  {loading ? <Skeleton className="h-8 w-16 mx-auto" /> : stat.value}
                 </motion.div>
-                <div className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{stat.label}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* Scroll Indicator - Hidden on mobile */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:block"
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       >

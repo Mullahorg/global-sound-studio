@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Headphones, User, Shield, Heart, Command, MessageSquare } from "lucide-react";
+import { Menu, X, User, Shield, Heart, Command, MessageSquare, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { NotificationCenter } from "@/components/ui/NotificationCenter";
 import { KeyboardShortcutsHelp } from "@/components/ui/KeyboardShortcutsHelp";
+import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -26,6 +27,7 @@ export const Navbar = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { settings } = usePlatformSettings();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -46,6 +48,23 @@ export const Navbar = () => {
     checkAdmin();
   }, [user]);
 
+  // Close menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   return (
     <motion.nav
       initial={{ y: -100 }}
@@ -55,29 +74,29 @@ export const Navbar = () => {
         isScrolled ? "glass shadow-lg shadow-black/10" : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-20">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3 group z-50">
             <motion.div 
               whileHover={{ scale: 1.05, rotate: 5 }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-xl blur-md opacity-50 group-hover:opacity-80 transition-opacity" />
-              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center overflow-hidden">
-                <img src="/logo.png" alt="WE Global" className="w-8 h-8 object-contain" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-lg sm:rounded-xl blur-md opacity-50 group-hover:opacity-80 transition-opacity" />
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center overflow-hidden">
+                <img src="/logo.png" alt={settings.site_name} className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
               </div>
             </motion.div>
             <div className="flex flex-col">
-              <span className="font-display font-bold text-lg text-foreground leading-tight">
-                WE Global
+              <span className="font-display font-bold text-base sm:text-lg text-foreground leading-tight">
+                {settings.site_name}
               </span>
-              <span className="text-xs text-muted-foreground">Music Studio</span>
+              <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">Music Studio</span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-4 xl:gap-6">
             {navLinks.map((link, index) => {
               const isActive = location.pathname === link.href;
               return (
@@ -153,62 +172,163 @@ export const Navbar = () => {
           {/* Mobile Menu Toggle */}
           <motion.button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 text-foreground"
+            className="lg:hidden p-2 text-foreground z-50 relative"
             whileTap={{ scale: 0.9 }}
+            aria-label={isOpen ? "Close menu" : "Open menu"}
           >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            <AnimatePresence mode="wait">
+              {isOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X className="w-6 h-6" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Menu className="w-6 h-6" />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Full Screen Overlay */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden glass border-t border-border/50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-background/98 backdrop-blur-xl lg:hidden z-40"
           >
-            <div className="container mx-auto px-6 py-6 space-y-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  to={link.href}
-                  className={`block text-lg font-medium transition-colors ${
-                    location.pathname === link.href ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="pt-4 flex flex-col gap-3">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="flex flex-col h-full pt-20 pb-8 px-6 overflow-y-auto"
+            >
+              {/* Navigation Links */}
+              <nav className="flex-1 space-y-1">
+                {navLinks.map((link, index) => (
+                  <motion.div
+                    key={link.label}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 + index * 0.05 }}
+                  >
+                    <Link
+                      to={link.href}
+                      className={`flex items-center justify-between py-4 text-lg font-medium border-b border-border/30 transition-colors ${
+                        location.pathname === link.href 
+                          ? "text-primary" 
+                          : "text-foreground hover:text-primary"
+                      }`}
+                    >
+                      {link.label}
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </Link>
+                  </motion.div>
+                ))}
+              </nav>
+
+              {/* Mobile Actions */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="pt-6 space-y-3"
+              >
                 {user ? (
                   <>
+                    <div className="flex gap-3 mb-4">
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        onClick={() => navigate("/chat")}
+                        className="flex-1 h-12"
+                      >
+                        <MessageSquare className="w-5 h-5" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        onClick={() => navigate("/wishlist")}
+                        className="flex-1 h-12"
+                      >
+                        <Heart className="w-5 h-5" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        onClick={() => navigate("/referrals")}
+                        className="flex-1 h-12"
+                      >
+                        <User className="w-5 h-5" />
+                      </Button>
+                    </div>
                     {isAdmin && (
-                      <Button variant="outline" className="w-full justify-center" onClick={() => { navigate("/admin"); setIsOpen(false); }}>
-                        <Shield className="w-4 h-4 mr-2" />
+                      <Button 
+                        variant="outline" 
+                        className="w-full h-12 justify-center text-base" 
+                        onClick={() => navigate("/admin")}
+                      >
+                        <Shield className="w-5 h-5 mr-2" />
                         Admin Panel
                       </Button>
                     )}
-                    <Button variant="hero" className="w-full justify-center" onClick={() => { navigate("/dashboard"); setIsOpen(false); }}>
-                      <User className="w-4 h-4 mr-2" />
+                    <Button 
+                      variant="hero" 
+                      className="w-full h-12 justify-center text-base" 
+                      onClick={() => navigate("/dashboard")}
+                    >
+                      <User className="w-5 h-5 mr-2" />
                       Dashboard
                     </Button>
                   </>
                 ) : (
                   <>
-                    <Button variant="ghost" className="w-full justify-center" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
+                    <Button 
+                      variant="outline" 
+                      className="w-full h-12 justify-center text-base" 
+                      onClick={() => navigate("/auth")}
+                    >
                       Sign In
                     </Button>
-                    <Button variant="hero" className="w-full justify-center" onClick={() => { navigate("/booking"); setIsOpen(false); }}>
+                    <Button 
+                      variant="hero" 
+                      className="w-full h-12 justify-center text-base" 
+                      onClick={() => navigate("/booking")}
+                    >
                       Book Session
                     </Button>
                   </>
                 )}
-              </div>
-            </div>
+              </motion.div>
+
+              {/* Footer Info */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="pt-6 mt-6 border-t border-border/30 text-center"
+              >
+                <p className="text-sm text-muted-foreground">{settings.site_name}</p>
+                <p className="text-xs text-muted-foreground mt-1">{settings.contact_email}</p>
+              </motion.div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
