@@ -15,6 +15,7 @@ import { OnlineIndicator } from "@/components/ui/OnlineIndicator";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Analytics } from "@vercel/analytics/react";
+import { QuickAdminAccess } from "@/components/ui/QuickAdminAccess";
 
 // Eager loaded pages (critical path)
 import Index from "./pages/Index";
@@ -91,6 +92,7 @@ const App = () => (
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/referrals" element={<Referrals />} />
+                    <QuickAdminAccess />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
