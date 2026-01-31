@@ -1,34 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Settings, X, Users, MessageSquare, BarChart3, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useUserRole } from "@/hooks/useUserRole";
 
 export const QuickAdminAccess = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const { user } = useAuth();
+  const { isAdmin, loading } = useUserRole();
   const navigate = useNavigate();
 
-  const checkAdmin = async () => {
-    if (!user) return false;
-    
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-    
-    return profile?.role === 'admin';
-  };
+  // Prevent hydration errors
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  // Check admin status on mount
-  useState(() => {
-    checkAdmin().then(setIsAdmin);
-  });
-
-  if (!isAdmin) return null;
+  if (!mounted || loading || !isAdmin) return null;
 
   const quickActions = [
     { label: "Dashboard", icon: Settings, path: "/admin" },
@@ -87,9 +75,16 @@ export const QuickAdminAccess = () => {
             </div>
 
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Admin: {user?.email}
-              </p>
+              <Button
+                variant="ghost"
+                className="w-full text-sm"
+                onClick={() => {
+                  navigate("/admin");
+                  setIsOpen(false);
+                }}
+              >
+                Open Full Admin Panel →
+              </Button>
             </div>
           </div>
         </div>
