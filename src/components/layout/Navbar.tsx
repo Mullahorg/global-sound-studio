@@ -76,7 +76,7 @@ export const Navbar = () => {
           }} className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-lg blur-sm opacity-40 group-hover:opacity-60 transition-opacity" />
               <div className="relative w-8 h-8 bg-gradient-to-br from-primary to-accent flex items-center justify-center overflow-hidden rounded-full">
-                <img src={settings.site_logo || "/logo.png"} alt={settings.site_name} className="w-6 h-6 object-cover" onError={e => {
+                <img src={settings.site_logo || "/logo.png"} alt={settings.site_name} className="w-6 h-6 border-0 object-fill" onError={e => {
                 (e.target as HTMLImageElement).src = "/logo.png";
               }} />
               </div>
