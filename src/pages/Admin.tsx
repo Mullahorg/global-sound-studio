@@ -28,7 +28,9 @@ import {
   Building2,
   Menu,
   Home,
-  Palette
+  Palette,
+  MessageSquare,
+  AlertTriangle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +54,8 @@ import { ManualPaymentsPanel } from "@/components/admin/ManualPaymentsPanel";
 import { ReferralsPanel } from "@/components/admin/ReferralsPanel";
 import { FranchisePanel } from "@/components/admin/FranchisePanel";
 import { BrandingPanel } from "@/components/admin/BrandingPanel";
+import { ChatMonitorPanel } from "@/components/admin/ChatMonitorPanel";
+import { DisputesPanel } from "@/components/admin/DisputesPanel";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { useUserRole } from "@/hooks/useUserRole";
 
@@ -312,6 +316,8 @@ const Admin = () => {
   // Sidebar items based on role - Admin sees all, Producer sees limited
   const sidebarItems = isAdminRole ? [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "chat-monitor", label: "Chat Monitor", icon: MessageSquare },
+    { id: "disputes", label: "Disputes", icon: AlertTriangle },
     { id: "beats", label: "Beats CMS", icon: Music },
     { id: "bookings", label: "Bookings", icon: Calendar },
     { id: "orders", label: "Orders", icon: FileText },
@@ -787,6 +793,22 @@ const Admin = () => {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <h2 className="font-display text-2xl font-semibold mb-6">Producer Franchise</h2>
               <FranchisePanel />
+            </motion.div>
+          )}
+
+          {/* Chat Monitor Tab */}
+          {activeTab === "chat-monitor" && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <h2 className="font-display text-2xl font-semibold mb-6">Chat Monitoring</h2>
+              <ChatMonitorPanel />
+            </motion.div>
+          )}
+
+          {/* Disputes Tab */}
+          {activeTab === "disputes" && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <h2 className="font-display text-2xl font-semibold mb-6">Dispute Management</h2>
+              <DisputesPanel />
             </motion.div>
           )}
 
