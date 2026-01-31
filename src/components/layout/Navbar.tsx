@@ -38,37 +38,26 @@ export const Navbar = () => {
         return; 
       }
       
-      // FIX: Check profiles table instead of user_roles
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role, client_type, badge")
-        .eq("id", user.id)
-        .single();
-      
-      // Check multiple admin indicators
-      const adminIndicators = [
-        profile?.role === 'admin',
-        profile?.client_type === 'admin',
-        profile?.badge === 'global_staff',
-      ];
-      
-      // Also check user_roles as fallback
-      const { data: userRole } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      
-      const isUserAdmin = userRole?.role === 'admin';
-      
-      // Set admin if any indicator is true
-      setIsAdmin(adminIndicators.some(indicator => indicator) || isUserAdmin);
-      
-      console.log("Admin check:", {
-        userId: user.id,
-        profileRole: profile?.role,
-        isAdmin: adminIndicators.some(indicator => indicator) || isUserAdmin
-      });
+      try {
+        // Check profiles table for admin role
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .maybeSingle(); // Use maybeSingle instead of single
+        
+        if (error) {
+          console.error("Error checking admin role:", error);
+          setIsAdmin(false);
+          return;
+        }
+        
+        // Set admin if role is 'admin'
+        setIsAdmin(profile?.role === 'admin');
+      } catch (error) {
+        console.error("Error in admin check:", error);
+        setIsAdmin(false);
+      }
     };
     
     checkAdminRole();
