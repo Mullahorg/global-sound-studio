@@ -253,6 +253,50 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_flags: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          flagged_by: string
+          id: string
+          message_id: string
+          reason: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          flagged_by: string
+          id?: string
+          message_id: string
+          reason: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          flagged_by?: string
+          id?: string
+          message_id?: string
+          reason?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_flags_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -346,6 +390,88 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      disputes: {
+        Row: {
+          admin_notes: string | null
+          booking_id: string | null
+          conversation_id: string | null
+          created_at: string
+          description: string
+          dispute_type: string
+          id: string
+          order_id: string | null
+          priority: string
+          reported_user_id: string | null
+          reporter_id: string
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          booking_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          description: string
+          dispute_type?: string
+          id?: string
+          order_id?: string | null
+          priority?: string
+          reported_user_id?: string | null
+          reporter_id: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          booking_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          description?: string
+          dispute_type?: string
+          id?: string
+          order_id?: string | null
+          priority?: string
+          reported_user_id?: string | null
+          reporter_id?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
         ]
@@ -1006,6 +1132,7 @@ export type Database = {
           id: string
           phone: string | null
           region: string | null
+          role: string | null
           social_links: Json | null
           updated_at: string
         }
@@ -1021,6 +1148,7 @@ export type Database = {
           id: string
           phone?: string | null
           region?: string | null
+          role?: string | null
           social_links?: Json | null
           updated_at?: string
         }
@@ -1036,6 +1164,7 @@ export type Database = {
           id?: string
           phone?: string | null
           region?: string | null
+          role?: string | null
           social_links?: Json | null
           updated_at?: string
         }
