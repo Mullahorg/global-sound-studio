@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface PlatformSettings {
   site_name: string;
+  site_logo: string;
   hero_title: string;
   hero_subtitle: string;
   hero_badge: string;
@@ -19,6 +20,7 @@ export interface PlatformSettings {
 
 const defaultSettings: PlatformSettings = {
   site_name: "WE Global",
+  site_logo: "/logo.png",
   hero_title: "Global Sound. One Studio.",
   hero_subtitle: "A borderless ecosystem connecting artists, producers, labels, and brands through world-class music production. Your vision, our craft.",
   hero_badge: "World-Class Production Studio",

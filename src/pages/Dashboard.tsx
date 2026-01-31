@@ -147,8 +147,15 @@ const Dashboard = () => {
       {/* Logo */}
       <div className="p-4 sm:p-6 border-b border-border/50">
         <Link to="/" className="flex items-center gap-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <Headphones className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center overflow-hidden">
+            <img 
+              src={settings.site_logo || "/logo.png"} 
+              alt={settings.site_name} 
+              className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/logo.png";
+              }}
+            />
           </div>
           <div className="flex-1 min-w-0">
             <span className="font-display font-bold text-foreground text-sm sm:text-base truncate block">{settings.site_name}</span>

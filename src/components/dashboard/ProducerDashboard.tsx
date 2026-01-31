@@ -155,42 +155,42 @@ export const ProducerDashboard = ({ userId, profile }: ProducerDashboardProps) =
 
         <TabsContent value="overview" className="space-y-8">
           {/* Stats */}
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {[
               { label: "Total Earnings", value: formatPrice(totalEarnings), icon: DollarSign, color: "primary" },
               { label: "Total Sales", value: sales.length, icon: TrendingUp, color: "accent" },
               { label: "Total Plays", value: totalPlays.toLocaleString(), icon: Play, color: "primary" },
               { label: "Active Beats", value: beats.length, icon: Music, color: "accent" },
             ].map((stat, i) => (
-              <div key={i} className="p-6 rounded-xl bg-card border border-border/50">
-                <div className="flex items-center justify-between mb-4">
-                  <stat.icon className={`w-8 h-8 ${stat.color === "primary" ? "text-primary" : "text-accent"}`} />
-                  <TrendingUp className="w-4 h-4 text-green-500" />
+              <div key={i} className="p-4 sm:p-6 rounded-xl bg-card border border-border/50">
+                <div className="flex items-center justify-between mb-2 sm:mb-4">
+                  <stat.icon className={`w-6 h-6 sm:w-8 sm:h-8 ${stat.color === "primary" ? "text-primary" : "text-accent"}`} />
+                  <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
                 </div>
-                <p className="text-3xl font-display font-bold text-foreground">{stat.value}</p>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
+                <p className="text-xl sm:text-3xl font-display font-bold text-foreground">{stat.value}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{stat.label}</p>
               </div>
             ))}
           </div>
 
           {/* Quick Actions */}
-          <div className="flex gap-3">
-            <Button variant="hero" onClick={() => setShowUploadDialog(true)}>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button variant="hero" onClick={() => setShowUploadDialog(true)} className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               Upload New Beat
             </Button>
-            <Button variant="outline" onClick={() => navigate("/beats")}>
+            <Button variant="outline" onClick={() => navigate("/beats")} className="w-full sm:w-auto">
               <Eye className="w-4 h-4 mr-2" />
               View Marketplace
             </Button>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
         {/* My Beats */}
-        <div className="p-6 rounded-xl bg-card border border-border/50">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-display text-xl font-semibold">My Beats</h2>
-            <Button variant="ghost" size="sm" onClick={() => setShowUploadDialog(true)}>
+        <div className="p-4 sm:p-6 rounded-xl bg-card border border-border/50">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="font-display text-lg sm:text-xl font-semibold">My Beats</h2>
+            <Button variant="ghost" size="sm" onClick={() => setShowUploadDialog(true)} className="text-xs sm:text-sm">
               Add New
             </Button>
           </div>

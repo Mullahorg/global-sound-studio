@@ -123,33 +123,33 @@ export const ArtistDashboard = ({ userId, profile }: ArtistDashboardProps) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
+      className="space-y-6 sm:space-y-8"
     >
       {/* Stats */}
-      <div className="grid md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {[
           { label: "Beats Purchased", value: purchases.length, icon: Music, color: "primary" },
           { label: "Upcoming Sessions", value: bookings.filter(b => b.status !== "completed" && b.status !== "cancelled").length, icon: Calendar, color: "accent" },
           { label: "Total Spent", value: formatPrice(totalSpent), icon: CreditCard, color: "primary" },
           { label: "Total Bookings", value: bookings.length, icon: Clock, color: "accent" },
         ].map((stat, i) => (
-          <div key={i} className="p-6 rounded-xl bg-card border border-border/50">
-            <div className="flex items-center justify-between mb-4">
-              <stat.icon className={`w-8 h-8 ${stat.color === "primary" ? "text-primary" : "text-accent"}`} />
-              <TrendingUp className="w-4 h-4 text-green-500" />
+          <div key={i} className="p-4 sm:p-6 rounded-xl bg-card border border-border/50">
+            <div className="flex items-center justify-between mb-2 sm:mb-4">
+              <stat.icon className={`w-6 h-6 sm:w-8 sm:h-8 ${stat.color === "primary" ? "text-primary" : "text-accent"}`} />
+              <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
             </div>
-            <p className="text-3xl font-display font-bold text-foreground">{stat.value}</p>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
+            <p className="text-xl sm:text-3xl font-display font-bold text-foreground">{stat.value}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{stat.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Purchased Beats */}
-        <div className="p-6 rounded-xl bg-card border border-border/50">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-display text-xl font-semibold">My Beats</h2>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/beats")}>
+        <div className="p-4 sm:p-6 rounded-xl bg-card border border-border/50">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="font-display text-lg sm:text-xl font-semibold">My Beats</h2>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/beats")} className="text-xs sm:text-sm">
               Browse More
             </Button>
           </div>

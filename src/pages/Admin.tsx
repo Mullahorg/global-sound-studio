@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useNavigate, Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   LayoutDashboard, 
   Music, 
@@ -25,7 +25,10 @@ import {
   Rocket,
   Wallet,
   Gift,
-  Building2
+  Building2,
+  Menu,
+  Home,
+  Palette
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +51,9 @@ import { OrdersPanel } from "@/components/admin/OrdersPanel";
 import { ManualPaymentsPanel } from "@/components/admin/ManualPaymentsPanel";
 import { ReferralsPanel } from "@/components/admin/ReferralsPanel";
 import { FranchisePanel } from "@/components/admin/FranchisePanel";
+import { BrandingPanel } from "@/components/admin/BrandingPanel";
+import { usePlatformSettings } from "@/hooks/usePlatformSettings";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface Beat {
   id: string;
@@ -84,6 +90,8 @@ const Admin = () => {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { settings } = usePlatformSettings();
+  const { role, isAdmin: isAdminRole, isProducer, permissions } = useUserRole();
   
   const [activeTab, setActiveTab] = useState("overview");
   const [beats, setBeats] = useState<Beat[]>([]);
@@ -92,6 +100,7 @@ const Admin = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showBeatDialog, setShowBeatDialog] = useState(false);
   const [editingBeat, setEditingBeat] = useState<Beat | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Beat form state
   const [beatForm, setBeatForm] = useState({
@@ -300,7 +309,8 @@ const Admin = () => {
     );
   }
 
-  const sidebarItems = [
+  // Sidebar items based on role - Admin sees all, Producer sees limited
+  const sidebarItems = isAdminRole ? [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "beats", label: "Beats CMS", icon: Music },
     { id: "bookings", label: "Bookings", icon: Calendar },
@@ -314,72 +324,138 @@ const Admin = () => {
     { id: "franchise", label: "Franchise", icon: Building2 },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "content", label: "Content", icon: FileText },
+    { id: "branding", label: "Branding", icon: Palette },
+    { id: "settings", label: "Settings", icon: Settings },
+  ] : [
+    // Producer sees limited items
+    { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "beats", label: "My Beats", icon: Music },
+    { id: "bookings", label: "My Bookings", icon: Calendar },
+    { id: "payouts", label: "Payouts", icon: Wallet },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
   const stats = [
-    { label: "Total Revenue", value: `$${bookings.reduce((acc, b) => acc + (b.total_price || 0), 0).toLocaleString()}`, icon: DollarSign, trend: "+12%" },
+    { label: "Total Revenue", value: `KES ${bookings.reduce((acc, b) => acc + (b.total_price || 0), 0).toLocaleString()}`, icon: DollarSign, trend: "+12%" },
     { label: "Total Beats", value: beats.length.toString(), icon: Music, trend: "+3" },
     { label: "Active Bookings", value: bookings.filter(b => b.status === "pending" || b.status === "confirmed").length.toString(), icon: Calendar, trend: "+5" },
     { label: "Total Users", value: users.length.toString(), icon: Users, trend: "+8" },
   ];
 
+  const SidebarContent = () => (
+    <>
+      <div className="p-4 sm:p-6 border-b border-border/50">
+        <Link to="/" className="flex items-center gap-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center overflow-hidden">
+            <img src="/logo.png" alt={settings.site_name} className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+          </div>
+          <div>
+            <span className="font-display font-bold text-foreground text-sm sm:text-base">{settings.site_name}</span>
+            <Badge className="ml-2 text-xs bg-destructive/10 text-destructive">{isAdminRole ? "Admin" : "Producer"}</Badge>
+          </div>
+        </Link>
+      </div>
+
+      <nav className="flex-1 p-3 sm:p-4 space-y-1 overflow-y-auto">
+        {sidebarItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => {
+              setActiveTab(item.id);
+              setSidebarOpen(false);
+            }}
+            className={`w-full flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-all text-sm sm:text-base ${
+              activeTab === item.id
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+          >
+            <item.icon className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            <span className="font-medium">{item.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      <div className="p-3 sm:p-4 border-t border-border/50 space-y-1">
+        <Link 
+          to="/" 
+          className="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground transition-all text-sm sm:text-base"
+        >
+          <Home className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span className="font-medium">Back to Home</span>
+        </Link>
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-muted-foreground text-sm"
+          onClick={handleSignOut}
+        >
+          <LogOut className="w-4 h-4 sm:w-5 sm:h-5 mr-3" />
+          Sign Out
+        </Button>
+      </div>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-card border-r border-border/50 flex flex-col">
-        <div className="p-6 border-b border-border/50">
-          <a href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <Headphones className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <span className="font-display font-bold text-foreground">WE Global</span>
-              <Badge className="ml-2 text-xs bg-destructive/10 text-destructive">Admin</Badge>
-            </div>
-          </a>
-        </div>
+      {/* Mobile Header */}
+      <div className="fixed top-0 left-0 right-0 h-14 sm:h-16 bg-background/95 backdrop-blur-sm border-b border-border/50 flex items-center justify-between px-4 lg:hidden z-40">
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 text-foreground"
+        >
+          <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+        <span className="font-display font-bold text-foreground">{isAdminRole ? "Admin Panel" : "Producer Panel"}</span>
+        <div className="w-10" />
+      </div>
 
-        <nav className="flex-1 p-4 space-y-1">
-          {sidebarItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                activeTab === item.id
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-              }`}
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: -300 }}
+              animate={{ x: 0 }}
+              exit={{ x: -300 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed top-0 left-0 bottom-0 w-[280px] sm:w-72 bg-card border-r border-border/50 flex flex-col z-50 lg:hidden"
             >
-              <item.icon className="w-5 h-5" />
-              <span className="font-medium">{item.label}</span>
-            </button>
-          ))}
-        </nav>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <SidebarContent />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
-        <div className="p-4 border-t border-border/50">
-          <Button
-            variant="ghost"
-            className="w-full justify-start text-muted-foreground"
-            onClick={handleSignOut}
-          >
-            <LogOut className="w-5 h-5 mr-3" />
-            Sign Out
-          </Button>
-        </div>
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex w-64 xl:w-72 bg-card border-r border-border/50 flex-col sticky top-0 h-screen">
+        <SidebarContent />
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        <div className="p-8">
+      <main className="flex-1 overflow-auto pt-14 sm:pt-16 lg:pt-0">
+        <div className="p-4 sm:p-6 lg:p-8">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
-              <h1 className="font-display text-3xl font-bold text-foreground">
-                Admin Dashboard
+              <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
+                {isAdminRole ? "Admin Dashboard" : "Producer Dashboard"}
               </h1>
-              <p className="text-muted-foreground mt-1">
-                Manage your platform content and settings
+              <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+                {isAdminRole ? "Manage your platform content and settings" : "Manage your beats and track your earnings"}
               </p>
             </div>
           </div>
@@ -713,6 +789,9 @@ const Admin = () => {
               <FranchisePanel />
             </motion.div>
           )}
+
+          {/* Branding Tab */}
+          {activeTab === "branding" && <BrandingPanel />}
 
           {/* Settings Tab */}
           {activeTab === "settings" && <SettingsPanel />}
