@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, User, Shield, Heart, Command, MessageSquare } from "lucide-react";
+import { Menu, X, User, Shield, Heart, Command, MessageSquare, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,16 +32,46 @@ export const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    const checkAdmin = async () => {
-      if (!user) { setIsAdmin(false); return; }
-      const { data } = await supabase
+    const checkAdminRole = async () => {
+      if (!user) { 
+        setIsAdmin(false); 
+        return; 
+      }
+      
+      // FIX: Check profiles table instead of user_roles
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, client_type, badge")
+        .eq("id", user.id)
+        .single();
+      
+      // Check multiple admin indicators
+      const adminIndicators = [
+        profile?.role === 'admin',
+        profile?.client_type === 'admin',
+        profile?.badge === 'global_staff',
+      ];
+      
+      // Also check user_roles as fallback
+      const { data: userRole } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id)
         .maybeSingle();
-      setIsAdmin(data?.role === "admin" || data?.role === "producer");
+      
+      const isUserAdmin = userRole?.role === 'admin';
+      
+      // Set admin if any indicator is true
+      setIsAdmin(adminIndicators.some(indicator => indicator) || isUserAdmin);
+      
+      console.log("Admin check:", {
+        userId: user.id,
+        profileRole: profile?.role,
+        isAdmin: adminIndicators.some(indicator => indicator) || isUserAdmin
+      });
     };
-    checkAdmin();
+    
+    checkAdminRole();
   }, [user]);
 
   // Close menu on route change
@@ -136,8 +166,13 @@ export const Navbar = () => {
                   <Heart className="w-4 h-4" />
                 </Button>
                 {isAdmin && (
-                  <Button variant="ghost" size="sm" className="h-8 px-3" onClick={() => navigate("/admin")}>
-                    <Shield className="w-4 h-4 mr-1" />
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 px-3 bg-gradient-to-r from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 text-purple-700 hover:text-purple-800 border border-purple-200"
+                    onClick={() => navigate("/admin")}
+                  >
+                    <Settings className="w-4 h-4 mr-1" />
                     Admin
                   </Button>
                 )}
@@ -251,11 +286,11 @@ export const Navbar = () => {
                     {isAdmin && (
                       <Button 
                         variant="outline" 
-                        className="w-full h-10 justify-center" 
+                        className="w-full h-10 justify-center bg-gradient-to-r from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 text-purple-700 hover:text-purple-800 border border-purple-200" 
                         onClick={() => navigate("/admin")}
                       >
-                        <Shield className="w-4 h-4 mr-2" />
-                        Admin
+                        <Settings className="w-4 h-4 mr-2" />
+                        Admin Panel
                       </Button>
                     )}
                     <Button 
