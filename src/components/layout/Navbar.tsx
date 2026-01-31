@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, User, Shield, Heart, Command, MessageSquare, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useUserRole } from "@/hooks/useUserRole";
 import { NotificationCenter } from "@/components/ui/NotificationCenter";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
@@ -19,8 +19,8 @@ const navLinks = [
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const { user } = useAuth();
+  const { isAdmin } = useUserRole(); // Use the hook instead of local state
   const navigate = useNavigate();
   const location = useLocation();
   const { settings } = usePlatformSettings();
@@ -30,38 +30,6 @@ export const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  useEffect(() => {
-    const checkAdminRole = async () => {
-      if (!user) { 
-        setIsAdmin(false); 
-        return; 
-      }
-      
-      try {
-        // Check profiles table for admin role
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .maybeSingle(); // Use maybeSingle instead of single
-        
-        if (error) {
-          console.error("Error checking admin role:", error);
-          setIsAdmin(false);
-          return;
-        }
-        
-        // Set admin if role is 'admin'
-        setIsAdmin(profile?.role === 'admin');
-      } catch (error) {
-        console.error("Error in admin check:", error);
-        setIsAdmin(false);
-      }
-    };
-    
-    checkAdminRole();
-  }, [user]);
 
   // Close menu on route change
   useEffect(() => {
