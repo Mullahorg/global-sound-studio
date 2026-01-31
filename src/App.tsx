@@ -11,6 +11,7 @@ import { QuickActions } from "@/components/ui/QuickActions";
 import { PWAInstallPrompt } from "@/components/ui/PWAInstallPrompt";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { OnlineIndicator } from "@/components/ui/OnlineIndicator";
+import { Analytics } from "@vercel/analytics/react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Beats from "./pages/Beats";
@@ -58,6 +59,7 @@ const App = () => (
               <PWAInstallPrompt />
               <ScrollToTop />
               <OnlineIndicator />
+              <Analytics />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
