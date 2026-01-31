@@ -30,31 +30,43 @@ export function useUserRole() {
         return;
       }
 
-      // FIRST: Check profiles table (where your role actually is)
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role, client_type, badge")
-        .eq("id", user.id)
-        .maybeSingle();
+      try {
+        // Check profiles table (where your role actually is)
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .maybeSingle();
 
-      console.log("Profile role check:", profile?.role);
-      
-      // If role is in profiles table, use it
-      if (profile?.role) {
-        setRole(profile.role as AppRole);
+        if (profileError) {
+          console.error("Error fetching profile role:", profileError);
+        }
+
+        // If role is in profiles table, use it
+        if (profile?.role) {
+          setRole(profile.role as AppRole);
+          setLoading(false);
+          return;
+        }
+
+        // Fallback to user_roles table (legacy)
+        const { data: userRole, error: userRoleError } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (userRoleError) {
+          console.error("Error fetching user role:", userRoleError);
+        }
+
+        setRole(userRole?.role as AppRole || null);
+      } catch (error) {
+        console.error("Unexpected error in useUserRole:", error);
+        setRole(null);
+      } finally {
         setLoading(false);
-        return;
       }
-
-      // SECOND: Fallback to user_roles table (legacy)
-      const { data: userRole } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      setRole(userRole?.role as AppRole || null);
-      setLoading(false);
     };
 
     fetchRole();
@@ -70,7 +82,7 @@ export function useUserRole() {
     canManageBookings: role === "producer" || role === "admin",
     canViewFranchise: role === "producer" || role === "admin",
     canRequestPayouts: role === "producer" || role === "admin",
-    canAccessAdmin: role === "admin", // CHANGED: Only admin can access admin panel
+    canAccessAdmin: role === "admin", // Only admin can access admin panel
     canManageContent: role === "admin",
     canManageUsers: role === "admin",
     canViewAnalytics: role === "admin",
@@ -79,8 +91,6 @@ export function useUserRole() {
   const isArtist = role === "artist";
   const isProducer = role === "producer";
   const isAdmin = role === "admin";
-
-  console.log("Current role:", role, "Is admin?", isAdmin);
 
   return {
     role,
