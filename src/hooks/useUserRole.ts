@@ -30,13 +30,30 @@ export function useUserRole() {
         return;
       }
 
-      const { data } = await supabase
+      // FIRST: Check profiles table (where your role actually is)
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, client_type, badge")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      console.log("Profile role check:", profile?.role);
+      
+      // If role is in profiles table, use it
+      if (profile?.role) {
+        setRole(profile.role as AppRole);
+        setLoading(false);
+        return;
+      }
+
+      // SECOND: Fallback to user_roles table (legacy)
+      const { data: userRole } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id)
         .maybeSingle();
 
-      setRole(data?.role as AppRole || null);
+      setRole(userRole?.role as AppRole || null);
       setLoading(false);
     };
 
@@ -53,9 +70,7 @@ export function useUserRole() {
     canManageBookings: role === "producer" || role === "admin",
     canViewFranchise: role === "producer" || role === "admin",
     canRequestPayouts: role === "producer" || role === "admin",
-    canAccessAdmin: role === "producer" || role === "admin",
-    
-    // Admin only
+    canAccessAdmin: role === "admin", // CHANGED: Only admin can access admin panel
     canManageContent: role === "admin",
     canManageUsers: role === "admin",
     canViewAnalytics: role === "admin",
@@ -64,6 +79,8 @@ export function useUserRole() {
   const isArtist = role === "artist";
   const isProducer = role === "producer";
   const isAdmin = role === "admin";
+
+  console.log("Current role:", role, "Is admin?", isAdmin);
 
   return {
     role,
