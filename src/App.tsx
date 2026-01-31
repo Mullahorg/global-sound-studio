@@ -1,100 +1,110 @@
-// src/components/ui/QuickAdminAccess.tsx
-import { useState } from "react";
-import { Settings, X, Users, MessageSquare, BarChart3, Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { Suspense, lazy } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { AudioQueueProvider } from "@/contexts/AudioQueueContext";
+import { CommandPalette } from "@/components/ui/CommandPalette";
+import { QuickActions } from "@/components/ui/QuickActions";
+import { PWAInstallPrompt } from "@/components/ui/PWAInstallPrompt";
+import { ScrollToTop } from "@/components/ui/ScrollToTop";
+import { OnlineIndicator } from "@/components/ui/OnlineIndicator";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { Analytics } from "@vercel/analytics/react";
+import { QuickAdminAccess } from "@/components/ui/QuickAdminAccess";
 
-export const QuickAdminAccess = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const { user } = useAuth();
-  const navigate = useNavigate();
+// Eager loaded pages (critical path)
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import NotFound from "./pages/NotFound";
 
-  const checkAdmin = async () => {
-    if (!user) return false;
-    
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
-    
-    return profile?.role === 'admin';
-  };
+// Lazy loaded pages (code splitting)
+const Beats = lazy(() => import("./pages/Beats"));
+const Booking = lazy(() => import("./pages/Booking"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Studio = lazy(() => import("./pages/Studio"));
+const Admin = lazy(() => import("./pages/Admin"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Services = lazy(() => import("./pages/Services"));
+const Library = lazy(() => import("./pages/Library"));
+const Outreach = lazy(() => import("./pages/Outreach"));
+const Wishlist = lazy(() => import("./pages/Wishlist"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Licensing = lazy(() => import("./pages/Licensing"));
+const Support = lazy(() => import("./pages/Support"));
+const Chat = lazy(() => import("./pages/Chat"));
+const Profile = lazy(() => import("./pages/Profile"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Referrals = lazy(() => import("./pages/Referrals"));
 
-  // Check admin status on mount
-  useState(() => {
-    checkAdmin().then(setIsAdmin);
-  });
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-  if (!isAdmin) return null;
+const App = () => (
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <AudioQueueProvider>
+            <TooltipProvider>
+              <ErrorBoundary>
+                <Toaster />
+                <Sonner />
+                <CommandPalette />
+                <QuickActions />
+                <PWAInstallPrompt />
+                <ScrollToTop />
+                <OnlineIndicator />
+                <Analytics />
+                {/* Quick Admin Access Button (Floating) */}
+                <QuickAdminAccess />
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/beats" element={<Beats />} />
+                    <Route path="/booking" element={<Booking />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/studio" element={<Studio />} />
+                    <Route path="/admin" element={<Admin />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/library" element={<Library />} />
+                    <Route path="/outreach" element={<Outreach />} />
+                    <Route path="/wishlist" element={<Wishlist />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/licensing" element={<Licensing />} />
+                    <Route path="/support" element={<Support />} />
+                    <Route path="/chat" element={<Chat />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/referrals" element={<Referrals />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </ErrorBoundary>
+            </TooltipProvider>
+          </AudioQueueProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  </HelmetProvider>
+);
 
-  const quickActions = [
-    { label: "Dashboard", icon: Settings, path: "/admin" },
-    { label: "Users", icon: Users, path: "/admin?tab=users" },
-    { label: "Chat Monitor", icon: MessageSquare, path: "/admin?tab=chat-monitor" },
-    { label: "Analytics", icon: BarChart3, path: "/admin?tab=analytics" },
-    { label: "Disputes", icon: Shield, path: "/admin?tab=disputes" },
-  ];
-
-  return (
-    <>
-      {/* Floating Admin Button */}
-      <Button
-        size="icon"
-        className="fixed bottom-6 right-6 z-50 rounded-full w-12 h-12 shadow-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-        onClick={() => setIsOpen(true)}
-        title="Quick Admin Access"
-      >
-        <Settings className="w-5 h-5" />
-      </Button>
-
-      {/* Quick Admin Modal */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-sm w-full p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Settings className="w-5 h-5 text-purple-600" />
-                Quick Admin Access
-              </h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsOpen(false)}
-                className="rounded-full"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-
-            <div className="space-y-3">
-              {quickActions.map((action) => (
-                <Button
-                  key={action.label}
-                  variant="outline"
-                  className="w-full justify-start h-12"
-                  onClick={() => {
-                    navigate(action.path);
-                    setIsOpen(false);
-                  }}
-                >
-                  <action.icon className="w-4 h-4 mr-3" />
-                  {action.label}
-                </Button>
-              ))}
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Admin: {user?.email}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
+export default App;
