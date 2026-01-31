@@ -84,7 +84,14 @@ export const Navbar = () => {
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-lg sm:rounded-xl blur-md opacity-50 group-hover:opacity-80 transition-opacity" />
               <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center overflow-hidden">
-                <img src="/logo.png" alt={settings.site_name} className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+                <img 
+                  src={settings.site_logo || "/logo.png"} 
+                  alt={settings.site_name} 
+                  className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/logo.png";
+                  }}
+                />
               </div>
             </motion.div>
             <div className="flex flex-col">
