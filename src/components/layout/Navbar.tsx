@@ -1,22 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, User, Shield, Heart, Command, MessageSquare, ChevronRight } from "lucide-react";
+import { Menu, X, User, Shield, Heart, Command, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { NotificationCenter } from "@/components/ui/NotificationCenter";
-import { KeyboardShortcutsHelp } from "@/components/ui/KeyboardShortcutsHelp";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Studio", href: "/studio" },
-  { label: "Services", href: "/services" },
   { label: "Beats", href: "/beats" },
-  { label: "Library", href: "/library" },
-  { label: "Outreach", href: "/outreach" },
-  { label: "Book Session", href: "/booking" },
+  { label: "Book", href: "/booking" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -75,102 +71,88 @@ export const Navbar = () => {
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16 sm:h-20">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 sm:gap-3 group z-50">
+          <Link to="/" className="flex items-center gap-2 group z-50">
             <motion.div 
-              whileHover={{ scale: 1.05, rotate: 5 }}
+              whileHover={{ scale: 1.02 }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-lg sm:rounded-xl blur-md opacity-50 group-hover:opacity-80 transition-opacity" />
-              <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-lg blur-sm opacity-40 group-hover:opacity-60 transition-opacity" />
+              <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center overflow-hidden">
                 <img 
                   src={settings.site_logo || "/logo.png"} 
                   alt={settings.site_name} 
-                  className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
+                  className="w-6 h-6 object-contain"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = "/logo.png";
                   }}
                 />
               </div>
             </motion.div>
-            <div className="flex flex-col">
-              <span className="font-display font-bold text-base sm:text-lg text-foreground leading-tight">
-                {settings.site_name}
-              </span>
-              <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">Music Studio</span>
-            </div>
+            <span className="font-display font-bold text-sm text-foreground hidden sm:block">
+              {settings.site_name}
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-4 xl:gap-6">
-            {navLinks.map((link, index) => {
+          <div className="hidden lg:flex items-center gap-1">
+            {navLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (
-                <motion.div
+                <Link
                   key={link.label}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  to={link.href}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                    isActive 
+                      ? "text-primary bg-primary/10" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                  }`}
                 >
-                  <Link
-                    to={link.href}
-                    className={`relative text-sm font-medium transition-colors duration-300 group ${
-                      isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {link.label}
-                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 ${
-                      isActive ? "w-full" : "w-0 group-hover:w-full"
-                    }`} />
-                  </Link>
-                </motion.div>
+                  {link.label}
+                </Link>
               );
             })}
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden lg:flex items-center gap-2">
-            {/* Command Palette Trigger */}
+          <div className="hidden lg:flex items-center gap-1">
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={() => window.dispatchEvent(new CustomEvent("openCommandPalette"))}
-              className="hidden xl:flex items-center gap-2 text-muted-foreground hover:text-foreground"
+              className="w-8 h-8 text-muted-foreground hover:text-foreground"
             >
               <Command className="w-4 h-4" />
-              <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-secondary rounded">⌘K</kbd>
             </Button>
-            
-            <KeyboardShortcutsHelp />
             
             {user ? (
               <>
                 <NotificationCenter />
-                <Button variant="ghost" size="icon" onClick={() => navigate("/chat")} title="Messages">
+                <Button variant="ghost" size="icon" className="w-8 h-8" onClick={() => navigate("/chat")}>
                   <MessageSquare className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => navigate("/wishlist")} title="Wishlist">
+                <Button variant="ghost" size="icon" className="w-8 h-8" onClick={() => navigate("/wishlist")}>
                   <Heart className="w-4 h-4" />
                 </Button>
                 {isAdmin && (
-                  <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
-                    <Shield className="w-4 h-4 mr-2" />
+                  <Button variant="ghost" size="sm" className="h-8 px-3" onClick={() => navigate("/admin")}>
+                    <Shield className="w-4 h-4 mr-1" />
                     Admin
                   </Button>
                 )}
-                <Button variant="hero" size="sm" onClick={() => navigate("/dashboard")}>
-                  <User className="w-4 h-4 mr-2" />
+                <Button variant="hero" size="sm" className="h-8 px-3 ml-1" onClick={() => navigate("/dashboard")}>
+                  <User className="w-4 h-4 mr-1" />
                   Dashboard
                 </Button>
               </>
             ) : (
               <>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+                <Button variant="ghost" size="sm" className="h-8" onClick={() => navigate("/auth")}>
                   Sign In
                 </Button>
-                <Button variant="hero" size="sm" onClick={() => navigate("/booking")}>
-                  Book Session
+                <Button variant="hero" size="sm" className="h-8 ml-1" onClick={() => navigate("/booking")}>
+                  Book Now
                 </Button>
               </>
             )}
@@ -229,79 +211,59 @@ export const Navbar = () => {
             >
               {/* Navigation Links */}
               <nav className="flex-1 space-y-1">
-                {navLinks.map((link, index) => (
-                  <motion.div
+                {navLinks.map((link) => (
+                  <Link
                     key={link.label}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 + index * 0.05 }}
+                    to={link.href}
+                    className={`flex items-center py-3 text-base font-medium border-b border-border/20 transition-colors ${
+                      location.pathname === link.href 
+                        ? "text-primary" 
+                        : "text-foreground hover:text-primary"
+                    }`}
                   >
-                    <Link
-                      to={link.href}
-                      className={`flex items-center justify-between py-4 text-lg font-medium border-b border-border/30 transition-colors ${
-                        location.pathname === link.href 
-                          ? "text-primary" 
-                          : "text-foreground hover:text-primary"
-                      }`}
-                    >
-                      {link.label}
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                    </Link>
-                  </motion.div>
+                    {link.label}
+                  </Link>
                 ))}
               </nav>
 
               {/* Mobile Actions */}
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="pt-6 space-y-3"
-              >
+              <div className="pt-4 space-y-2">
                 {user ? (
                   <>
-                    <div className="flex gap-3 mb-4">
+                    <div className="flex gap-2 mb-3">
                       <Button 
                         variant="outline" 
-                        size="icon" 
+                        size="sm"
                         onClick={() => navigate("/chat")}
-                        className="flex-1 h-12"
+                        className="flex-1 h-10"
                       >
-                        <MessageSquare className="w-5 h-5" />
+                        <MessageSquare className="w-4 h-4" />
                       </Button>
                       <Button 
                         variant="outline" 
-                        size="icon" 
+                        size="sm"
                         onClick={() => navigate("/wishlist")}
-                        className="flex-1 h-12"
+                        className="flex-1 h-10"
                       >
-                        <Heart className="w-5 h-5" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="icon" 
-                        onClick={() => navigate("/referrals")}
-                        className="flex-1 h-12"
-                      >
-                        <User className="w-5 h-5" />
+                        <Heart className="w-4 h-4" />
                       </Button>
                     </div>
                     {isAdmin && (
                       <Button 
                         variant="outline" 
-                        className="w-full h-12 justify-center text-base" 
+                        className="w-full h-10 justify-center" 
                         onClick={() => navigate("/admin")}
                       >
-                        <Shield className="w-5 h-5 mr-2" />
-                        Admin Panel
+                        <Shield className="w-4 h-4 mr-2" />
+                        Admin
                       </Button>
                     )}
                     <Button 
                       variant="hero" 
-                      className="w-full h-12 justify-center text-base" 
+                      className="w-full h-10 justify-center" 
                       onClick={() => navigate("/dashboard")}
                     >
-                      <User className="w-5 h-5 mr-2" />
+                      <User className="w-4 h-4 mr-2" />
                       Dashboard
                     </Button>
                   </>
@@ -309,32 +271,26 @@ export const Navbar = () => {
                   <>
                     <Button 
                       variant="outline" 
-                      className="w-full h-12 justify-center text-base" 
+                      className="w-full h-10 justify-center" 
                       onClick={() => navigate("/auth")}
                     >
                       Sign In
                     </Button>
                     <Button 
                       variant="hero" 
-                      className="w-full h-12 justify-center text-base" 
+                      className="w-full h-10 justify-center" 
                       onClick={() => navigate("/booking")}
                     >
-                      Book Session
+                      Book Now
                     </Button>
                   </>
                 )}
-              </motion.div>
+              </div>
 
               {/* Footer Info */}
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="pt-6 mt-6 border-t border-border/30 text-center"
-              >
-                <p className="text-sm text-muted-foreground">{settings.site_name}</p>
-                <p className="text-xs text-muted-foreground mt-1">{settings.contact_email}</p>
-              </motion.div>
+              <div className="pt-4 mt-4 border-t border-border/20 text-center">
+                <p className="text-xs text-muted-foreground">{settings.site_name}</p>
+              </div>
             </motion.div>
           </motion.div>
         )}
