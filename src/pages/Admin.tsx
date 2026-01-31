@@ -91,17 +91,16 @@ interface User {
 }
 
 const Admin = () => {
-  const { user, signOut, loading } = useAuth();
+  const { user, signOut, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { settings } = usePlatformSettings();
-  const { role, isAdmin: isAdminRole, isProducer, permissions } = useUserRole();
+  const { role, isAdmin: isAdminRole, isProducer, loading: roleLoading } = useUserRole();
   
   const [activeTab, setActiveTab] = useState("overview");
   const [beats, setBeats] = useState<Beat[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [showBeatDialog, setShowBeatDialog] = useState(false);
   const [editingBeat, setEditingBeat] = useState<Beat | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -122,54 +121,61 @@ const Admin = () => {
   });
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       navigate("/auth");
     }
-  }, [user, loading, navigate]);
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     if (user) {
-      checkAdminRole();
       fetchData();
     }
   }, [user]);
 
-  const checkAdminRole = async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    
-    if (data?.role === "admin" || data?.role === "producer") {
-      setIsAdmin(true);
-    } else {
+  // Redirect non-admins
+  useEffect(() => {
+    if (!roleLoading && user && !isAdminRole) {
+      console.log("User is not admin, redirecting to dashboard");
       navigate("/dashboard");
     }
-  };
+  }, [roleLoading, user, isAdminRole, navigate]);
 
   const fetchData = async () => {
-    // Fetch beats
-    const { data: beatsData } = await supabase
-      .from("beats")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (beatsData) setBeats(beatsData);
+    try {
+      // Fetch beats
+      const { data: beatsData, error: beatsError } = await supabase
+        .from("beats")
+        .select("*")
+        .order("created_at", { ascending: false });
+      
+      if (beatsError) throw beatsError;
+      if (beatsData) setBeats(beatsData);
 
-    // Fetch bookings
-    const { data: bookingsData } = await supabase
-      .from("bookings")
-      .select("*")
-      .order("session_date", { ascending: false });
-    if (bookingsData) setBookings(bookingsData);
+      // Fetch bookings
+      const { data: bookingsData, error: bookingsError } = await supabase
+        .from("bookings")
+        .select("*")
+        .order("session_date", { ascending: false });
+      
+      if (bookingsError) throw bookingsError;
+      if (bookingsData) setBookings(bookingsData);
 
-    // Fetch users
-    const { data: usersData } = await supabase
-      .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (usersData) setUsers(usersData);
+      // Fetch users
+      const { data: usersData, error: usersError } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
+      
+      if (usersError) throw usersError;
+      if (usersData) setUsers(usersData);
+    } catch (error: any) {
+      console.error("Error fetching data:", error);
+      toast({ 
+        title: "Error", 
+        description: "Failed to fetch data", 
+        variant: "destructive" 
+      });
+    }
   };
 
   const handleSignOut = async () => {
@@ -302,19 +308,27 @@ const Admin = () => {
     }
   };
 
-  if (loading || !isAdmin) {
+  // Show loading while checking auth and role
+  const loading = authLoading || roleLoading;
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">Loading admin panel...</p>
         </div>
       </div>
     );
   }
 
-  // Sidebar items based on role - Admin sees all, Producer sees limited
-  const sidebarItems = isAdminRole ? [
+  // If not admin (after loading), show nothing (will redirect)
+  if (!isAdminRole) {
+    return null;
+  }
+
+  // Sidebar items - Admin sees all
+  const sidebarItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "chat-monitor", label: "Chat Monitor", icon: MessageSquare },
     { id: "disputes", label: "Disputes", icon: AlertTriangle },
@@ -331,13 +345,6 @@ const Admin = () => {
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "content", label: "Content", icon: FileText },
     { id: "branding", label: "Branding", icon: Palette },
-    { id: "settings", label: "Settings", icon: Settings },
-  ] : [
-    // Producer sees limited items
-    { id: "overview", label: "Overview", icon: LayoutDashboard },
-    { id: "beats", label: "My Beats", icon: Music },
-    { id: "bookings", label: "My Bookings", icon: Calendar },
-    { id: "payouts", label: "Payouts", icon: Wallet },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
@@ -357,7 +364,7 @@ const Admin = () => {
           </div>
           <div>
             <span className="font-display font-bold text-foreground text-sm sm:text-base">{settings.site_name}</span>
-            <Badge className="ml-2 text-xs bg-destructive/10 text-destructive">{isAdminRole ? "Admin" : "Producer"}</Badge>
+            <Badge className="ml-2 text-xs bg-green-500/10 text-green-600">Admin</Badge>
           </div>
         </Link>
       </div>
@@ -412,7 +419,7 @@ const Admin = () => {
         >
           <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
-        <span className="font-display font-bold text-foreground">{isAdminRole ? "Admin Panel" : "Producer Panel"}</span>
+        <span className="font-display font-bold text-foreground">Admin Panel</span>
         <div className="w-10" />
       </div>
 
@@ -458,11 +465,19 @@ const Admin = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
               <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
-                {isAdminRole ? "Admin Dashboard" : "Producer Dashboard"}
+                Admin Dashboard
               </h1>
               <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-                {isAdminRole ? "Manage your platform content and settings" : "Manage your beats and track your earnings"}
+                Welcome, {user?.email} • Manage your platform content and settings
               </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="bg-green-500/10 text-green-600">
+                Role: {role || "Admin"}
+              </Badge>
+              <Button variant="outline" size="sm" onClick={fetchData}>
+                Refresh Data
+              </Button>
             </div>
           </div>
 
