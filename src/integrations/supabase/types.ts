@@ -111,7 +111,7 @@ export type Database = {
         }
         Insert: {
           audio_url: string
-          bpm: number
+          bpm?: number
           cover_url?: string | null
           created_at?: string
           description?: string | null
