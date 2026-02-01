@@ -32,6 +32,12 @@ interface Producer {
   hourly_rate: number | null;
 }
 
+interface Order {
+  id: string;
+  license_type: string;
+  // ... other fields
+}
+
 const timeSlots = [
   "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"
 ];
@@ -51,6 +57,7 @@ const Booking = () => {
   const [sessionTypes, setSessionTypes] = useState<SessionType[]>([]);
   const [producers, setProducers] = useState<Producer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [validLicenseTypes, setValidLicenseTypes] = useState<string[]>([]);
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -61,56 +68,95 @@ const Booking = () => {
   }, []);
 
   const fetchData = async () => {
-    // Fetch session pricing from database
-    const { data: pricingData } = await supabase
-      .from("session_pricing")
-      .select("*")
-      .eq("is_active", true)
-      .order("price_kes", { ascending: true });
+    try {
+      // Fetch session pricing from database
+      const { data: pricingData } = await supabase
+        .from("session_pricing")
+        .select("*")
+        .eq("is_active", true)
+        .order("price_kes", { ascending: true });
 
-    if (pricingData) {
-      setSessionTypes(pricingData.map(p => ({
-        id: p.session_type,
-        session_type: p.session_type,
-        name: p.name,
-        description: p.description,
-        price_kes: Number(p.price_kes),
-        duration_hours: p.duration_hours,
-        icon: p.icon || "🎵",
-        is_active: p.is_active,
-      })));
-    }
-
-    // Fetch active franchise producers
-    const { data: producerSettings } = await supabase
-      .from("producer_settings")
-      .select("producer_id, bio_short, hourly_rate")
-      .eq("is_franchise_active", true)
-      .eq("booking_enabled", true);
-
-    if (producerSettings && producerSettings.length > 0) {
-      const producerIds = producerSettings.map(p => p.producer_id);
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, full_name, avatar_url")
-        .in("id", producerIds);
-
-      if (profiles) {
-        const enrichedProducers = profiles.map(profile => {
-          const settings = producerSettings.find(s => s.producer_id === profile.id);
-          return {
-            id: profile.id,
-            full_name: profile.full_name,
-            avatar_url: profile.avatar_url,
-            bio_short: settings?.bio_short || null,
-            hourly_rate: settings?.hourly_rate || null,
-          };
-        });
-        setProducers(enrichedProducers);
+      if (pricingData) {
+        setSessionTypes(pricingData.map(p => ({
+          id: p.session_type,
+          session_type: p.session_type,
+          name: p.name,
+          description: p.description,
+          price_kes: Number(p.price_kes),
+          duration_hours: p.duration_hours,
+          icon: p.icon || "🎵",
+          is_active: p.is_active,
+        })));
       }
-    }
 
-    setLoading(false);
+      // Fetch active franchise producers
+      const { data: producerSettings } = await supabase
+        .from("producer_settings")
+        .select("producer_id, bio_short, hourly_rate")
+        .eq("is_franchise_active", true)
+        .eq("booking_enabled", true);
+
+      if (producerSettings && producerSettings.length > 0) {
+        const producerIds = producerSettings.map(p => p.producer_id);
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, full_name, avatar_url")
+          .in("id", producerIds);
+
+        if (profiles) {
+          const enrichedProducers = profiles.map(profile => {
+            const settings = producerSettings.find(s => s.producer_id === profile.id);
+            return {
+              id: profile.id,
+              full_name: profile.full_name,
+              avatar_url: profile.avatar_url,
+              bio_short: settings?.bio_short || null,
+              hourly_rate: settings?.hourly_rate || null,
+            };
+          });
+          setProducers(enrichedProducers);
+        }
+      }
+
+      // Fetch valid license types from database constraints or enum
+      await fetchValidLicenseTypes();
+      
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast({
+        title: "Error loading data",
+        description: "Please refresh the page and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchValidLicenseTypes = async () => {
+    try {
+      // Try to get the enum values or check constraint values
+      const { data: enumData } = await supabase
+        .from("pg_enum")
+        .select("enumlabel")
+        .eq("enumtypid", 
+          supabase.from("pg_type")
+          .select("oid")
+          .eq("typname", "license_type_enum") // Adjust based on your enum name
+        );
+
+      if (enumData && enumData.length > 0) {
+        setValidLicenseTypes(enumData.map(item => item.enumlabel));
+      } else {
+        // If no enum, check common license types
+        // These are typical license types - adjust based on your business
+        setValidLicenseTypes(["personal", "commercial", "broadcast", "exclusive", "non-exclusive"]);
+      }
+    } catch (error) {
+      console.log("Could not fetch license types, using defaults");
+      // Default to common license types
+      setValidLicenseTypes(["personal", "commercial"]);
+    }
   };
 
   const selectedSessionData = sessionTypes.find(s => s.id === selectedSession);
@@ -118,6 +164,13 @@ const Booking = () => {
   const selectedProducerData = producers.find(p => p.id === selectedProducer);
 
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(calendarWeekStart, i));
+
+  const getDefaultLicenseType = () => {
+    // Choose a valid default license type
+    if (validLicenseTypes.includes("personal")) return "personal";
+    if (validLicenseTypes.includes("commercial")) return "commercial";
+    return validLicenseTypes[0] || null;
+  };
 
   const handleSubmit = async () => {
     if (!user) {
@@ -130,27 +183,69 @@ const Booking = () => {
       return;
     }
 
-    if (!selectedSession || !selectedDate || !selectedTime) return;
+    if (!selectedSession || !selectedDate || !selectedTime) {
+      toast({
+        title: "Missing information",
+        description: "Please select a session type, date, and time.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
+      // Get a valid license type
+      const defaultLicenseType = getDefaultLicenseType();
+      
+      if (!defaultLicenseType) {
+        throw new Error("No valid license type available. Please contact support.");
+      }
+
       // 1. FIRST CREATE AN ORDER WITH ALL REQUIRED FIELDS
+      const orderData: any = {
+        user_id: user.id,
+        order_number: `WGME-${Date.now().toString().slice(-8)}`,
+        amount: totalPrice,
+        license_type: defaultLicenseType, // ✅ Use valid license type
+        status: "pending",
+        created_at: new Date().toISOString(),
+      };
+
+      // Add optional fields if they exist in your schema
       const { data: order, error: orderError } = await supabase
         .from("orders")
-        .insert({
-          user_id: user.id,
-          order_number: `WGME-${Date.now().toString().slice(-8)}`,
-          amount: totalPrice, // ✅ Add the amount field
-          license_type: "none", // ✅ Add license_type field with default value
-          status: "pending", // ✅ Add status field if required
-          created_at: new Date().toISOString(),
-          // Add any other required fields based on your database schema
-        })
+        .insert(orderData)
         .select()
         .single();
 
-      if (orderError) throw orderError;
+      if (orderError) {
+        console.error("Order creation error:", orderError);
+        
+        // Try to get more info about the constraint
+        if (orderError.message.includes("license_type_check")) {
+          // Try to create order without license_type first (if nullable)
+          const { data: order2, error: orderError2 } = await supabase
+            .from("orders")
+            .insert({
+              user_id: user.id,
+              order_number: `WGME-${Date.now().toString().slice(-8)}`,
+              amount: totalPrice,
+              status: "pending",
+              created_at: new Date().toISOString(),
+            })
+            .select()
+            .single();
+            
+          if (orderError2) {
+            throw new Error(`Order creation failed: ${orderError2.message}. Please contact support.`);
+          }
+        } else {
+          throw orderError;
+        }
+      }
+
+      const createdOrder = order; // Use the successfully created order
 
       // 2. THEN CREATE BOOKING WITH ORDER ID
       const { data: booking, error: bookingError } = await supabase
@@ -164,8 +259,7 @@ const Booking = () => {
           total_price: totalPrice,
           notes: notes || null,
           status: "pending",
-          order_id: order.id, // ✅ Link to the created order
-          // Add producer_id if a producer was selected
+          order_id: createdOrder.id,
           ...(selectedProducer && { producer_id: selectedProducer }),
         })
         .select()
@@ -175,7 +269,7 @@ const Booking = () => {
 
       // Store both IDs
       setCreatedBookingId(booking.id);
-      setCreatedOrderId(order.id);
+      setCreatedOrderId(createdOrder.id);
       setShowMpesaDialog(true);
     } catch (error: any) {
       console.error("Booking error:", error);
