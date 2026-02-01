@@ -135,13 +135,17 @@ const Booking = () => {
     setIsSubmitting(true);
 
     try {
-      // 1. FIRST CREATE AN ORDER
+      // 1. FIRST CREATE AN ORDER WITH ALL REQUIRED FIELDS
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
           user_id: user.id,
           order_number: `WGME-${Date.now().toString().slice(-8)}`,
+          amount: totalPrice, // ✅ Add the amount field
+          license_type: "none", // ✅ Add license_type field with default value
+          status: "pending", // ✅ Add status field if required
           created_at: new Date().toISOString(),
+          // Add any other required fields based on your database schema
         })
         .select()
         .single();
@@ -161,6 +165,8 @@ const Booking = () => {
           notes: notes || null,
           status: "pending",
           order_id: order.id, // ✅ Link to the created order
+          // Add producer_id if a producer was selected
+          ...(selectedProducer && { producer_id: selectedProducer }),
         })
         .select()
         .single();
@@ -193,7 +199,16 @@ const Booking = () => {
         .update({ status: "confirmed" })
         .eq("id", createdBookingId);
 
-      // 2. Create manual payment record with valid order_id
+      // 2. Update order status to completed
+      await supabase
+        .from("orders")
+        .update({ 
+          status: "completed",
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", createdOrderId);
+
+      // 3. Create manual payment record with valid order_id
       await supabase.from("manual_payments").insert({
         id: crypto.randomUUID(),
         order_id: createdOrderId,
