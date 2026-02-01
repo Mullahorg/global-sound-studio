@@ -47,6 +47,7 @@ const Booking = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMpesaDialog, setShowMpesaDialog] = useState(false);
   const [createdBookingId, setCreatedBookingId] = useState<string | null>(null);
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [sessionTypes, setSessionTypes] = useState<SessionType[]>([]);
   const [producers, setProducers] = useState<Producer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,27 +135,47 @@ const Booking = () => {
     setIsSubmitting(true);
 
     try {
-      // Create booking with pending status
-      const { data: booking, error } = await supabase.from("bookings").insert({
-        client_id: user.id,
-        session_type: selectedSession as "recording" | "mixing" | "mastering" | "production" | "consultation",
-        session_date: format(selectedDate, "yyyy-MM-dd"),
-        start_time: selectedTime,
-        duration_hours: selectedSessionData?.duration_hours || 2,
-        total_price: totalPrice,
-        notes: notes || null,
-        status: "pending",
-      }).select().single();
+      // 1. FIRST CREATE AN ORDER
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          user_id: user.id,
+          order_number: `WGME-${Date.now().toString().slice(-8)}`,
+          created_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (orderError) throw orderError;
 
-      // Store booking ID and show M-Pesa dialog
+      // 2. THEN CREATE BOOKING WITH ORDER ID
+      const { data: booking, error: bookingError } = await supabase
+        .from("bookings")
+        .insert({
+          client_id: user.id,
+          session_type: selectedSession as "recording" | "mixing" | "mastering" | "production" | "consultation",
+          session_date: format(selectedDate, "yyyy-MM-dd"),
+          start_time: selectedTime,
+          duration_hours: selectedSessionData?.duration_hours || 2,
+          total_price: totalPrice,
+          notes: notes || null,
+          status: "pending",
+          order_id: order.id, // ✅ Link to the created order
+        })
+        .select()
+        .single();
+
+      if (bookingError) throw bookingError;
+
+      // Store both IDs
       setCreatedBookingId(booking.id);
+      setCreatedOrderId(order.id);
       setShowMpesaDialog(true);
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Booking error:", error);
       toast({
         title: "Booking failed",
-        description: "Something went wrong. Please try again.",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -162,14 +183,46 @@ const Booking = () => {
     }
   };
 
-  const handlePaymentSuccess = () => {
-    toast({
-      title: "Booking confirmed!",
-      description: "Payment successful. You'll receive a confirmation shortly.",
-    });
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 2000);
+  const handlePaymentSuccess = async () => {
+    if (!createdBookingId || !createdOrderId) return;
+
+    try {
+      // 1. Update booking status to confirmed
+      await supabase
+        .from("bookings")
+        .update({ status: "confirmed" })
+        .eq("id", createdBookingId);
+
+      // 2. Create manual payment record with valid order_id
+      await supabase.from("manual_payments").insert({
+        id: crypto.randomUUID(),
+        order_id: createdOrderId,
+        user_id: user?.id,
+        amount: totalPrice,
+        currency: "KES",
+        reference_code: `MPESA-${Date.now()}`,
+        status: "completed",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
+      toast({
+        title: "Booking confirmed!",
+        description: "Payment successful. You'll receive a confirmation shortly.",
+      });
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
+
+    } catch (error) {
+      console.error("Payment success handler error:", error);
+      toast({
+        title: "Payment recorded, but update failed",
+        description: "Your payment was successful but there was an issue updating your booking.",
+        variant: "warning",
+      });
+    }
   };
 
   return (
@@ -491,8 +544,12 @@ const Booking = () => {
         onOpenChange={(open) => {
           setShowMpesaDialog(open);
           if (!open && createdBookingId) {
-            // If dialog closed without payment, we could cancel the booking
-            // For now, let it remain pending
+            // Optional: You could cancel the booking if payment dialog is closed
+            toast({
+              title: "Payment cancelled",
+              description: "You can complete the payment later from your dashboard.",
+              variant: "warning",
+            });
           }
         }}
         amount={totalPrice}
