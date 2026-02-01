@@ -68,22 +68,32 @@ export const Navbar = () => {
     ease: "easeOut"
   }} className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "glass shadow-lg shadow-black/10" : "bg-transparent"}`}>
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-14 sm:h-16">
+        <div className="flex items-center justify-between h-18 sm:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group z-50">
+          <Link to="/" className="flex items-center gap-3 group z-50">
             <motion.div whileHover={{
-            scale: 1.02
+            scale: 1.03
           }} className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-lg blur-sm opacity-40 group-hover:opacity-60 transition-opacity" />
-              <div className="relative w-8 h-8 bg-gradient-to-br from-primary to-accent flex items-center justify-center overflow-hidden rounded-full">
-                <img src={settings.site_logo || "/logo.png"} alt={settings.site_name} className="w-6 h-6 border-0 object-fill" onError={e => {
-                (e.target as HTMLImageElement).src = "/logo.png";
-              }} />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary via-accent to-destructive rounded-xl blur-md opacity-50 group-hover:opacity-70 transition-opacity" />
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center overflow-hidden rounded-xl bg-background/80 backdrop-blur-sm border border-border/30">
+                <img 
+                  src={settings.site_logo || "/logo.png"} 
+                  alt={settings.site_name} 
+                  className="w-10 h-10 sm:w-12 sm:h-12 object-contain" 
+                  onError={e => {
+                    (e.target as HTMLImageElement).src = "/logo.png";
+                  }} 
+                />
               </div>
             </motion.div>
-            <span className="font-display font-bold text-sm text-foreground hidden sm:block">
-              {settings.site_name}
-            </span>
+            <div className="hidden sm:flex flex-col">
+              <span className="font-display font-bold text-base sm:text-lg text-foreground leading-tight">
+                {settings.site_name}
+              </span>
+              <span className="text-[10px] sm:text-xs text-muted-foreground font-medium tracking-wider uppercase">
+                Music Empire
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
