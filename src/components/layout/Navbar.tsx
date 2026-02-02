@@ -68,18 +68,18 @@ export const Navbar = () => {
     ease: "easeOut"
   }} className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "glass shadow-lg shadow-black/10" : "bg-transparent"}`}>
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-18 sm:h-20">
+        <div className="flex items-center justify-between h-22 sm:h-24">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group z-50">
+          <Link to="/" className="flex items-center gap-4 group z-50">
             <motion.div whileHover={{
             scale: 1.03
           }} className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary via-accent to-destructive rounded-xl blur-md opacity-50 group-hover:opacity-70 transition-opacity" />
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center overflow-hidden rounded-xl bg-background/80 backdrop-blur-sm border border-border/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary via-accent to-destructive rounded-2xl blur-lg opacity-60 group-hover:opacity-80 transition-opacity" />
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center overflow-hidden rounded-2xl bg-background/90 backdrop-blur-sm border-2 border-primary/30 shadow-lg shadow-primary/20">
                 <img 
                   src={settings.site_logo || "/logo.png"} 
                   alt={settings.site_name} 
-                  className="w-10 h-10 sm:w-12 sm:h-12 object-contain" 
+                  className="w-14 h-14 sm:w-18 sm:h-18 object-contain" 
                   onError={e => {
                     (e.target as HTMLImageElement).src = "/logo.png";
                   }} 
@@ -87,10 +87,10 @@ export const Navbar = () => {
               </div>
             </motion.div>
             <div className="hidden sm:flex flex-col">
-              <span className="font-display font-bold text-base sm:text-lg text-foreground leading-tight">
+              <span className="font-display font-bold text-lg sm:text-xl text-foreground leading-tight">
                 {settings.site_name}
               </span>
-              <span className="text-[10px] sm:text-xs text-muted-foreground font-medium tracking-wider uppercase">
+              <span className="text-xs sm:text-sm text-primary font-semibold tracking-wider uppercase">
                 Music Empire
               </span>
             </div>
