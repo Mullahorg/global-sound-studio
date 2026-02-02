@@ -1,3 +1,4 @@
+import React, { forwardRef } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { HelpCircle, ArrowRight } from "lucide-react";
@@ -36,9 +37,9 @@ const faqs = [
   },
 ];
 
-export const FAQSection = () => {
+export const FAQSection = forwardRef<HTMLElement, object>(function FAQSection(_, ref) {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden">
+    <section ref={ref} className="py-24 md:py-32 relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-card/30 to-background" />
       
@@ -117,4 +118,4 @@ export const FAQSection = () => {
       </div>
     </section>
   );
-};
+});
