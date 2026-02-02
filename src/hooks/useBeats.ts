@@ -53,8 +53,8 @@ export const useBeats = (options: UseBeatsOptions = {}) => {
 
       if (fetchError) throw fetchError;
 
-      // Fetch producer profiles separately
-      const producerIds = [...new Set((beatsData || []).map(b => b.producer_id))];
+      // Fetch producer profiles separately - filter out null/undefined producer_ids
+      const producerIds = [...new Set((beatsData || []).map(b => b.producer_id).filter((id): id is string => id !== null && id !== undefined))];
       
       let profilesMap: Record<string, { full_name: string | null; badge: string | null; country: string | null }> = {};
       
