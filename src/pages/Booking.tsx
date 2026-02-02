@@ -134,29 +134,9 @@ const Booking = () => {
   };
 
   const fetchValidLicenseTypes = async () => {
-    try {
-      // Try to get the enum values or check constraint values
-      const { data: enumData } = await supabase
-        .from("pg_enum")
-        .select("enumlabel")
-        .eq("enumtypid", 
-          supabase.from("pg_type")
-          .select("oid")
-          .eq("typname", "license_type_enum") // Adjust based on your enum name
-        );
-
-      if (enumData && enumData.length > 0) {
-        setValidLicenseTypes(enumData.map(item => item.enumlabel));
-      } else {
-        // If no enum, check common license types
-        // These are typical license types - adjust based on your business
-        setValidLicenseTypes(["personal", "commercial", "broadcast", "exclusive", "non-exclusive"]);
-      }
-    } catch (error) {
-      console.log("Could not fetch license types, using defaults");
-      // Default to common license types
-      setValidLicenseTypes(["personal", "commercial"]);
-    }
+    // Use the known license types from the database schema
+    // These match the license_type enum: basic, premium, exclusive, none
+    setValidLicenseTypes(["basic", "premium", "exclusive", "none"]);
   };
 
   const selectedSessionData = sessionTypes.find(s => s.id === selectedSession);
@@ -166,10 +146,8 @@ const Booking = () => {
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(calendarWeekStart, i));
 
   const getDefaultLicenseType = () => {
-    // Choose a valid default license type
-    if (validLicenseTypes.includes("personal")) return "personal";
-    if (validLicenseTypes.includes("commercial")) return "commercial";
-    return validLicenseTypes[0] || null;
+    // For bookings, use 'none' as the license type since they don't need licenses
+    return "none";
   };
 
   const handleSubmit = async () => {
@@ -329,7 +307,7 @@ const Booking = () => {
       toast({
         title: "Payment recorded, but update failed",
         description: "Your payment was successful but there was an issue updating your booking.",
-        variant: "warning",
+        variant: "destructive",
       });
     }
   };
@@ -657,7 +635,6 @@ const Booking = () => {
             toast({
               title: "Payment cancelled",
               description: "You can complete the payment later from your dashboard.",
-              variant: "warning",
             });
           }
         }}

@@ -215,6 +215,7 @@ export type Database = {
           duration_hours: number
           id: string
           notes: string | null
+          order_id: string | null
           producer_id: string | null
           session_date: string
           session_type: Database["public"]["Enums"]["session_type"]
@@ -229,6 +230,7 @@ export type Database = {
           duration_hours?: number
           id?: string
           notes?: string | null
+          order_id?: string | null
           producer_id?: string | null
           session_date: string
           session_type: Database["public"]["Enums"]["session_type"]
@@ -243,6 +245,7 @@ export type Database = {
           duration_hours?: number
           id?: string
           notes?: string | null
+          order_id?: string | null
           producer_id?: string | null
           session_date?: string
           session_type?: Database["public"]["Enums"]["session_type"]
@@ -251,7 +254,15 @@ export type Database = {
           total_price?: number | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bookings_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       chat_flags: {
         Row: {
@@ -708,8 +719,9 @@ export type Database = {
           download_expires_at: string | null
           download_url: string | null
           id: string
-          license_type: string
+          license_type: string | null
           order_number: string
+          order_type: string | null
           payment_method: string | null
           status: string
           updated_at: string
@@ -723,8 +735,9 @@ export type Database = {
           download_expires_at?: string | null
           download_url?: string | null
           id?: string
-          license_type: string
+          license_type?: string | null
           order_number?: string
+          order_type?: string | null
           payment_method?: string | null
           status?: string
           updated_at?: string
@@ -738,8 +751,9 @@ export type Database = {
           download_expires_at?: string | null
           download_url?: string | null
           id?: string
-          license_type?: string
+          license_type?: string | null
           order_number?: string
+          order_type?: string | null
           payment_method?: string | null
           status?: string
           updated_at?: string
@@ -1634,7 +1648,7 @@ export type Database = {
         | "melancholic"
         | "happy"
       booking_status: "pending" | "confirmed" | "completed" | "cancelled"
-      license_type: "basic" | "premium" | "exclusive"
+      license_type: "basic" | "premium" | "exclusive" | "none"
       project_status:
         | "draft"
         | "in_progress"
@@ -1798,7 +1812,7 @@ export const Constants = {
         "happy",
       ],
       booking_status: ["pending", "confirmed", "completed", "cancelled"],
-      license_type: ["basic", "premium", "exclusive"],
+      license_type: ["basic", "premium", "exclusive", "none"],
       project_status: [
         "draft",
         "in_progress",

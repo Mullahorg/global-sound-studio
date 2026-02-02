@@ -95,19 +95,57 @@ export const ManualPaymentsPanel = () => {
   const fetchPayments = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // First fetch manual payments
+      const { data: paymentsData, error: paymentsError } = await supabase
         .from("manual_payments")
-        .select(`
-          *,
-          profiles:user_id (full_name, email),
-          orders:order_id (order_number, total_amount)
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (paymentsError) throw paymentsError;
+
+      // Get unique user IDs and order IDs
+      const userIds = [...new Set((paymentsData || []).map(p => p.user_id))];
+      const orderIds = [...new Set((paymentsData || []).filter(p => p.order_id).map(p => p.order_id))];
+
+      // Fetch profiles separately
+      let profilesMap: Record<string, { full_name: string | null; email: string | null }> = {};
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, full_name, email")
+          .in("id", userIds);
+        if (profiles) {
+          profilesMap = profiles.reduce((acc, p) => {
+            acc[p.id] = { full_name: p.full_name, email: p.email };
+            return acc;
+          }, {} as typeof profilesMap);
+        }
+      }
+
+      // Fetch orders separately
+      let ordersMap: Record<string, { order_number: string | null; total_amount: number | null }> = {};
+      if (orderIds.length > 0) {
+        const { data: orders } = await supabase
+          .from("orders")
+          .select("id, order_number, amount")
+          .in("id", orderIds);
+        if (orders) {
+          ordersMap = orders.reduce((acc, o) => {
+            acc[o.id] = { order_number: o.order_number, total_amount: o.amount };
+            return acc;
+          }, {} as typeof ordersMap);
+        }
+      }
+
+      // Combine data
+      const enrichedPayments: ManualPayment[] = (paymentsData || []).map(payment => ({
+        ...payment,
+        profiles: profilesMap[payment.user_id] || { full_name: null, email: null },
+        orders: payment.order_id ? ordersMap[payment.order_id] || null : null,
+      }));
 
       // Filter out system-generated payments (like booking approvals)
-      const manualEntries = (data || []).filter(payment => 
+      const manualEntries = enrichedPayments.filter(payment => 
         payment.reference_code?.startsWith("MPESA-") || 
         payment.reference_code?.startsWith("PAYBILL-") ||
         payment.reference_code?.startsWith("BANK-") ||
