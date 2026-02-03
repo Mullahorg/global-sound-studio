@@ -56,8 +56,10 @@ import { FranchisePanel } from "@/components/admin/FranchisePanel";
 import { BrandingPanel } from "@/components/admin/BrandingPanel";
 import { ChatMonitorPanel } from "@/components/admin/ChatMonitorPanel";
 import { DisputesPanel } from "@/components/admin/DisputesPanel";
+import { SupportTicketsPanel } from "@/components/admin/SupportTicketsPanel";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { useUserRole } from "@/hooks/useUserRole";
+import { logDatabaseError } from "@/lib/errorLogger";
 
 interface Beat {
   id: string;
@@ -169,7 +171,7 @@ const Admin = () => {
       if (usersError) throw usersError;
       if (usersData) setUsers(usersData);
     } catch (error: any) {
-      console.error("Error fetching data:", error);
+      logDatabaseError(error, "multiple tables", "select", { context: "admin data fetch" });
       toast({ 
         title: "Error", 
         description: "Failed to fetch data", 
@@ -331,6 +333,7 @@ const Admin = () => {
   const sidebarItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "chat-monitor", label: "Chat Monitor", icon: MessageSquare },
+    { id: "support-tickets", label: "Support Tickets", icon: Headphones },
     { id: "disputes", label: "Disputes", icon: AlertTriangle },
     { id: "beats", label: "Beats CMS", icon: Music },
     { id: "bookings", label: "Bookings", icon: Calendar },
@@ -826,6 +829,9 @@ const Admin = () => {
               <DisputesPanel />
             </motion.div>
           )}
+
+          {/* Support Tickets Tab */}
+          {activeTab === "support-tickets" && <SupportTicketsPanel />}
 
           {/* Branding Tab */}
           {activeTab === "branding" && <BrandingPanel />}
