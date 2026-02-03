@@ -12,6 +12,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MpesaCheckoutDialog } from "@/components/payments/MpesaCheckoutDialog";
+import { logDatabaseError, logPaymentError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("Booking");
 
 interface SessionType {
   id: string;
@@ -122,7 +125,7 @@ const Booking = () => {
       await fetchValidLicenseTypes();
       
     } catch (error) {
-      console.error("Error fetching data:", error);
+      logger.error(error, "fetchData", { action: "loading session types and producers" });
       toast({
         title: "Error loading data",
         description: "Please refresh the page and try again.",
@@ -198,7 +201,7 @@ const Booking = () => {
         .single();
 
       if (orderError) {
-        console.error("Order creation error:", orderError);
+        logDatabaseError(orderError, "orders", "insert", { amount: totalPrice, session: selectedSession });
         
         // Try to get more info about the constraint
         if (orderError.message.includes("license_type_check")) {
@@ -250,7 +253,11 @@ const Booking = () => {
       setCreatedOrderId(createdOrder.id);
       setShowMpesaDialog(true);
     } catch (error: any) {
-      console.error("Booking error:", error);
+      logDatabaseError(error, "bookings", "insert", { 
+        session: selectedSession, 
+        date: selectedDate?.toISOString(),
+        time: selectedTime 
+      });
       toast({
         title: "Booking failed",
         description: error.message || "Something went wrong. Please try again.",
@@ -303,7 +310,10 @@ const Booking = () => {
       }, 2000);
 
     } catch (error) {
-      console.error("Payment success handler error:", error);
+      logPaymentError(error, "M-Pesa", "booking payment confirmation", {
+        bookingId: createdBookingId,
+        orderId: createdOrderId
+      });
       toast({
         title: "Payment recorded, but update failed",
         description: "Your payment was successful but there was an issue updating your booking.",

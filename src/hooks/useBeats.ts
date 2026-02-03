@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { logDatabaseError } from "@/lib/errorLogger";
 
 type BeatRow = Database["public"]["Tables"]["beats"]["Row"];
 type Beat = BeatRow & {
@@ -90,7 +91,7 @@ export const useBeats = (options: UseBeatsOptions = {}) => {
 
       setBeats(enrichedBeats);
     } catch (err: any) {
-      console.error("Error fetching beats:", err);
+      logDatabaseError(err, "beats", "select", { filters: options });
       setError(err.message);
     } finally {
       setLoading(false);

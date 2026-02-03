@@ -16,7 +16,8 @@ import {
   ExternalLink,
   FileText,
   Headphones,
-  BookOpen
+  BookOpen,
+  CheckCircle2
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
@@ -28,9 +29,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PageMeta } from "@/components/seo/PageMeta";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { logDatabaseError } from "@/lib/errorLogger";
 
 const Support = () => {
+  const { user } = useAuth();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -163,15 +170,81 @@ const Support = () => {
     },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.category || !formData.message) {
       toast.error("Please fill in all required fields");
       return;
     }
-    toast.success("Support ticket submitted! We'll respond within 24 hours.");
-    setFormData({ name: "", email: "", category: "", orderId: "", message: "" });
+
+    setIsSubmitting(true);
+    
+    try {
+      const { error } = await supabase.from("support_tickets").insert({
+        user_id: user?.id || null,
+        name: formData.name,
+        email: formData.email,
+        category: formData.category,
+        order_id: formData.orderId || null,
+        message: formData.message,
+        status: "open",
+        priority: "normal",
+      });
+
+      if (error) {
+        logDatabaseError(error, "support_tickets", "insert", { category: formData.category });
+        throw error;
+      }
+      
+      setIsSubmitted(true);
+      toast.success("Support ticket submitted! We'll respond within 24 hours.");
+      setFormData({ name: "", email: "", category: "", orderId: "", message: "" });
+    } catch (error) {
+      toast.error("Failed to submit ticket. Please try again or contact us via WhatsApp.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // Success screen
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="pt-24 pb-16 flex items-center justify-center min-h-[80vh]">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center max-w-md mx-auto px-6"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", delay: 0.2 }}
+              className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6"
+            >
+              <CheckCircle2 className="w-10 h-10 text-green-500" />
+            </motion.div>
+            <h1 className="font-display text-3xl font-bold mb-4">Ticket Submitted!</h1>
+            <p className="text-muted-foreground mb-8">
+              Thank you for reaching out. We've received your support ticket and will respond within 24 hours.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button variant="hero" onClick={() => setIsSubmitted(false)}>
+                Submit Another Ticket
+              </Button>
+              <Link to="/">
+                <Button variant="outline">
+                  Back to Home
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -390,9 +463,18 @@ const Support = () => {
                     rows={6}
                   />
                 </div>
-                <Button type="submit" variant="hero" className="w-full">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Submit Ticket
+                <Button type="submit" variant="hero" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin mr-2" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      Submit Ticket
+                    </>
+                  )}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
                   We typically respond within 24 hours. For urgent issues, use WhatsApp.
