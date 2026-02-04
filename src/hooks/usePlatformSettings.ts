@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("usePlatformSettings");
 
 export interface PlatformSettings {
   site_name: string;
@@ -41,21 +44,31 @@ export function usePlatformSettings() {
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const { data } = await supabase
-        .from("platform_settings")
-        .select("setting_key, setting_value");
+      try {
+        const { data, error } = await supabase
+          .from("platform_settings")
+          .select("setting_key, setting_value");
 
-      if (data && data.length > 0) {
-        const settingsMap: Record<string, string> = {};
-        data.forEach((s) => {
-          settingsMap[s.setting_key] = s.setting_value || "";
-        });
-        setSettings({
-          ...defaultSettings,
-          ...settingsMap,
-        } as PlatformSettings);
+        if (error) {
+          logDatabaseError(error, "platform_settings", "select");
+          throw error;
+        }
+
+        if (data && data.length > 0) {
+          const settingsMap: Record<string, string> = {};
+          data.forEach((s) => {
+            settingsMap[s.setting_key] = s.setting_value || "";
+          });
+          setSettings({
+            ...defaultSettings,
+            ...settingsMap,
+          } as PlatformSettings);
+        }
+      } catch (error) {
+        logger.error(error, "fetchSettings");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchSettings();

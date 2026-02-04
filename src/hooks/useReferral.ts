@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("useReferral");
 
 export const useReferral = () => {
   const { user } = useAuth();
@@ -20,20 +23,29 @@ export const useReferral = () => {
 
     try {
       // Try to fetch existing code
-      let { data: codeData } = await supabase
+      let { data: codeData, error: fetchError } = await supabase
         .from("referral_codes")
         .select("code")
         .eq("user_id", user.id)
         .maybeSingle();
 
+      if (fetchError) {
+        logDatabaseError(fetchError, "referral_codes", "select", { userId: user.id });
+      }
+
       if (!codeData) {
         // Create a new referral code
         const code = generateReferralCode(user.id);
-        const { data: newCode } = await supabase
+        const { data: newCode, error: insertError } = await supabase
           .from("referral_codes")
           .insert({ user_id: user.id, code })
           .select("code")
           .single();
+
+        if (insertError) {
+          logDatabaseError(insertError, "referral_codes", "insert", { userId: user.id });
+          throw insertError;
+        }
 
         if (newCode) {
           codeData = newCode;
@@ -44,7 +56,7 @@ export const useReferral = () => {
         setReferralCode(codeData.code);
       }
     } catch (error) {
-      console.error("Error fetching referral code:", error);
+      logger.error(error, "fetchOrCreateReferralCode");
     } finally {
       setLoading(false);
     }
@@ -55,14 +67,23 @@ export const useReferral = () => {
   };
 
   const validateReferralCode = async (code: string) => {
-    const { data } = await supabase
-      .from("referral_codes")
-      .select("id, user_id, is_active")
-      .eq("code", code)
-      .eq("is_active", true)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from("referral_codes")
+        .select("id, user_id, is_active")
+        .eq("code", code)
+        .eq("is_active", true)
+        .maybeSingle();
 
-    return data;
+      if (error) {
+        logDatabaseError(error, "referral_codes", "select", { code });
+      }
+
+      return data;
+    } catch (error) {
+      logger.error(error, "validateReferralCode", { code });
+      return null;
+    }
   };
 
   const recordReferral = async (referralCodeId: string, referrerId: string) => {
@@ -77,25 +98,36 @@ export const useReferral = () => {
         qualification_type: "signup",
       });
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "referrals", "insert", { referralCodeId, referrerId });
+        throw error;
+      }
 
       // Manually increment uses_count on referral code
-      const { data: currentCode } = await supabase
+      const { data: currentCode, error: fetchError } = await supabase
         .from("referral_codes")
         .select("uses_count")
         .eq("id", referralCodeId)
         .single();
 
+      if (fetchError) {
+        logDatabaseError(fetchError, "referral_codes", "select", { referralCodeId });
+      }
+
       if (currentCode) {
-        await supabase
+        const { error: updateError } = await supabase
           .from("referral_codes")
           .update({ uses_count: (currentCode.uses_count || 0) + 1 })
           .eq("id", referralCodeId);
+
+        if (updateError) {
+          logDatabaseError(updateError, "referral_codes", "update", { referralCodeId });
+        }
       }
 
       return true;
     } catch (error) {
-      console.error("Error recording referral:", error);
+      logger.error(error, "recordReferral", { referralCodeId, referrerId });
       return false;
     }
   };

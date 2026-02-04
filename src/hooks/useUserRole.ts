@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("useUserRole");
 
 export type AppRole = "artist" | "producer" | "admin" | null;
 
@@ -39,7 +42,7 @@ export function useUserRole() {
           .maybeSingle();
 
         if (profileError) {
-          console.error("Error fetching profile role:", profileError);
+          logDatabaseError(profileError, "profiles", "select", { context: "fetch role", userId: user.id });
         }
 
         // If role is in profiles table, use it
@@ -57,12 +60,12 @@ export function useUserRole() {
           .maybeSingle();
 
         if (userRoleError) {
-          console.error("Error fetching user role:", userRoleError);
+          logDatabaseError(userRoleError, "user_roles", "select", { context: "fetch role fallback", userId: user.id });
         }
 
         setRole(userRole?.role as AppRole || null);
       } catch (error) {
-        console.error("Unexpected error in useUserRole:", error);
+        logger.error(error, "fetchRole");
         setRole(null);
       } finally {
         setLoading(false);

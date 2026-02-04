@@ -26,6 +26,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCurrency } from "@/hooks/useCurrency";
 import { useNavigate } from "react-router-dom";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("Referrals");
 
 interface ReferralStats {
   totalReferrals: number;
@@ -174,7 +177,7 @@ export default function Referrals() {
         }));
       }
     } catch (error) {
-      console.error("Error fetching referral data:", error);
+      logger.error(error, "fetchReferralData");
     } finally {
       setLoading(false);
     }

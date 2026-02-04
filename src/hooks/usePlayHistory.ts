@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("usePlayHistory");
 
 interface PlayHistoryItem {
   id: string;
@@ -50,7 +53,10 @@ export const usePlayHistory = () => {
         .order("played_at", { ascending: false })
         .limit(50);
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "play_history", "select", { userId: user.id });
+        throw error;
+      }
 
       if (!historyData || historyData.length === 0) {
         setHistory([]);
@@ -60,20 +66,28 @@ export const usePlayHistory = () => {
 
       // Fetch beat details for each history item
       const beatIds = [...new Set(historyData.map(h => h.beat_id))];
-      const { data: beatsData } = await supabase
+      const { data: beatsData, error: beatsError } = await supabase
         .from("beats")
         .select("*")
         .in("id", beatIds);
+
+      if (beatsError) {
+        logDatabaseError(beatsError, "beats", "select", { context: "play history beats" });
+      }
 
       // Fetch producer profiles
       const producerIds = [...new Set((beatsData || []).map(b => b.producer_id).filter(Boolean))];
       let profilesMap: Record<string, { full_name: string | null; badge: string | null; country: string | null }> = {};
 
       if (producerIds.length > 0) {
-        const { data: profiles } = await supabase
+        const { data: profiles, error: profilesError } = await supabase
           .from("profiles")
           .select("id, full_name, badge, country")
           .in("id", producerIds);
+
+        if (profilesError) {
+          logDatabaseError(profilesError, "profiles", "select", { context: "play history producers" });
+        }
 
         if (profiles) {
           profilesMap = profiles.reduce((acc, p) => {
@@ -95,7 +109,7 @@ export const usePlayHistory = () => {
 
       setHistory(enrichedHistory);
     } catch (err) {
-      console.error("Error fetching play history:", err);
+      logger.error(err, "fetchHistory");
     } finally {
       setLoading(false);
     }
@@ -110,17 +124,22 @@ export const usePlayHistory = () => {
       if (!user) return;
 
       try {
-        await supabase.from("play_history").insert({
+        const { error } = await supabase.from("play_history").insert({
           user_id: user.id,
           beat_id: beatId,
           duration_seconds: durationSeconds,
           completed,
         });
 
+        if (error) {
+          logDatabaseError(error, "play_history", "insert", { beatId });
+          throw error;
+        }
+
         // Refresh history
         fetchHistory();
       } catch (err) {
-        console.error("Error recording play:", err);
+        logger.error(err, "recordPlay", { beatId });
       }
     },
     [user, fetchHistory]
@@ -131,13 +150,18 @@ export const usePlayHistory = () => {
       if (!user) return;
 
       try {
-        await supabase
+        const { error } = await supabase
           .from("play_history")
           .update({ duration_seconds: durationSeconds, completed })
           .eq("id", historyId)
           .eq("user_id", user.id);
+
+        if (error) {
+          logDatabaseError(error, "play_history", "update", { historyId });
+          throw error;
+        }
       } catch (err) {
-        console.error("Error updating play duration:", err);
+        logger.error(err, "updatePlayDuration", { historyId });
       }
     },
     [user]

@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("useChat");
 
 export interface Message {
   id: string;
@@ -63,7 +66,10 @@ export const useConversations = () => {
         `)
         .order("updated_at", { ascending: false });
 
-      if (convError) throw convError;
+      if (convError) {
+        logDatabaseError(convError, "conversations", "select");
+        throw convError;
+      }
 
       // Fetch participant profiles and last messages
       const conversationsWithDetails = await Promise.all(
@@ -114,7 +120,7 @@ export const useConversations = () => {
 
       setConversations(conversationsWithDetails);
     } catch (error) {
-      console.error("Error fetching conversations:", error);
+      logger.error(error, "fetchConversations");
       toast({
         title: "Error",
         description: "Failed to load conversations",
@@ -139,7 +145,10 @@ export const useConversations = () => {
         .select()
         .single();
 
-      if (convError) throw convError;
+      if (convError) {
+        logDatabaseError(convError, "conversations", "insert");
+        throw convError;
+      }
 
       // Add all participants including current user
       const allParticipants = [...new Set([user.id, ...participantIds])];
@@ -153,12 +162,15 @@ export const useConversations = () => {
           }))
         );
 
-      if (partError) throw partError;
+      if (partError) {
+        logDatabaseError(partError, "conversation_participants", "insert");
+        throw partError;
+      }
 
       await fetchConversations();
       return conv;
     } catch (error) {
-      console.error("Error creating conversation:", error);
+      logger.error(error, "createConversation");
       toast({
         title: "Error",
         description: "Failed to create conversation",
@@ -202,7 +214,10 @@ export const useMessages = (conversationId: string | null) => {
         .eq("conversation_id", conversationId)
         .order("created_at", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "messages", "select");
+        throw error;
+      }
 
       // Fetch sender profiles
       const senderIds = [...new Set(data?.map((m) => m.sender_id) || [])];
@@ -228,7 +243,7 @@ export const useMessages = (conversationId: string | null) => {
           .eq("user_id", user.id);
       }
     } catch (error) {
-      console.error("Error fetching messages:", error);
+      logger.error(error, "fetchMessages");
       toast({
         title: "Error",
         description: "Failed to load messages",
@@ -256,7 +271,10 @@ export const useMessages = (conversationId: string | null) => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "messages", "insert");
+        throw error;
+      }
 
       // Update conversation timestamp
       await supabase
@@ -266,7 +284,7 @@ export const useMessages = (conversationId: string | null) => {
 
       return data;
     } catch (error) {
-      console.error("Error sending message:", error);
+      logger.error(error, "sendMessage");
       toast({
         title: "Error",
         description: "Failed to send message",
@@ -283,9 +301,12 @@ export const useMessages = (conversationId: string | null) => {
         .update({ content: newContent, is_edited: true })
         .eq("id", messageId);
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "messages", "update");
+        throw error;
+      }
     } catch (error) {
-      console.error("Error editing message:", error);
+      logger.error(error, "editMessage");
       toast({
         title: "Error",
         description: "Failed to edit message",
@@ -301,9 +322,12 @@ export const useMessages = (conversationId: string | null) => {
         .delete()
         .eq("id", messageId);
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "messages", "delete");
+        throw error;
+      }
     } catch (error) {
-      console.error("Error deleting message:", error);
+      logger.error(error, "deleteMessage");
       toast({
         title: "Error",
         description: "Failed to delete message",

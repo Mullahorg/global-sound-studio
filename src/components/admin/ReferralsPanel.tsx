@@ -9,6 +9,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCurrency } from "@/hooks/useCurrency";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("ReferralsPanel");
 
 interface Referral {
   id: string;
@@ -100,7 +103,7 @@ export const ReferralsPanel = () => {
         );
       }
     } catch (error) {
-      console.error("Error fetching referral data:", error);
+      logger.error(error, "fetchData");
     } finally {
       setLoading(false);
     }
@@ -113,11 +116,15 @@ export const ReferralsPanel = () => {
         .update({ status })
         .eq("id", id);
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "referrals", "update", { id, status });
+        throw error;
+      }
 
       toast.success(`Referral marked as ${status}`);
       fetchData();
     } catch (error: any) {
+      logger.error(error, "updateReferralStatus");
       toast.error(error.message || "Failed to update referral");
     }
   };
