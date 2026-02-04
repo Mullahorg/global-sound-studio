@@ -15,6 +15,9 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("FileUploadButton");
 
 interface FileUploadButtonProps {
   conversationId: string;
@@ -118,7 +121,7 @@ export const FileUploadButton = ({
         description: `${file.name} shared successfully`,
       });
     } catch (error) {
-      console.error("Upload error:", error);
+      logger.error(error, "handleFileChange");
       toast({
         title: "Upload failed",
         description: "Failed to upload file. Please try again.",

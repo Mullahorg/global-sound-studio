@@ -27,6 +27,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("Outreach");
 
 interface Program {
   id: string;
@@ -152,7 +155,10 @@ export default function Outreach() {
         ...applicationForm,
       });
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "outreach_applications", "insert");
+        throw error;
+      }
 
       toast({ title: "Application submitted!", description: "We'll review your application and get back to you soon." });
       setSelectedProgram(null);
@@ -167,6 +173,7 @@ export default function Outreach() {
         why_apply: "",
       });
     } catch (error: any) {
+      logger.error(error, "handleApply");
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }
     setApplying(false);

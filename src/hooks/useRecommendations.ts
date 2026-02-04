@@ -3,6 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWishlist } from "@/hooks/useWishlist";
 import { usePlayHistory } from "@/hooks/usePlayHistory";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("useRecommendations");
 
 interface Beat {
   id: string;
@@ -43,10 +46,14 @@ export const useRecommendations = (limit: number = 8) => {
       let wishlistMoods: string[] = [];
 
       if (wishlistBeatIds.length > 0) {
-        const { data: wishlistBeats } = await supabase
+        const { data: wishlistBeats, error: wishlistError } = await supabase
           .from("beats")
           .select("genre, mood")
           .in("id", wishlistBeatIds);
+
+        if (wishlistError) {
+          logDatabaseError(wishlistError, "beats", "select", { context: "wishlist genres" });
+        }
 
         if (wishlistBeats) {
           wishlistGenres = [...new Set(wishlistBeats.map(b => b.genre))];
@@ -71,17 +78,24 @@ export const useRecommendations = (limit: number = 8) => {
 
       const { data: beatsData, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "beats", "select", { context: "recommendations" });
+        throw error;
+      }
 
       // Fetch producer profiles
       const producerIds = [...new Set((beatsData || []).map(b => b.producer_id).filter(Boolean))];
       let profilesMap: Record<string, { full_name: string | null; badge: string | null; country: string | null }> = {};
 
       if (producerIds.length > 0) {
-        const { data: profiles } = await supabase
+        const { data: profiles, error: profilesError } = await supabase
           .from("profiles")
           .select("id, full_name, badge, country")
           .in("id", producerIds);
+
+        if (profilesError) {
+          logDatabaseError(profilesError, "profiles", "select", { context: "producer profiles" });
+        }
 
         if (profiles) {
           profilesMap = profiles.reduce((acc, p) => {
@@ -129,15 +143,20 @@ export const useRecommendations = (limit: number = 8) => {
 
       setRecommendations(cleanedBeats);
     } catch (err) {
-      console.error("Error fetching recommendations:", err);
+      logger.error(err, "fetchRecommendations");
       
       // Fallback: just get popular beats
       try {
-        const { data } = await supabase
+        const { data, error: fallbackError } = await supabase
           .from("beats")
           .select("*")
           .order("play_count", { ascending: false })
           .limit(limit);
+
+        if (fallbackError) {
+          logDatabaseError(fallbackError, "beats", "select", { context: "fallback recommendations" });
+          throw fallbackError;
+        }
 
         const producerIds = [...new Set((data || []).map(b => b.producer_id).filter(Boolean))];
         let profilesMap: Record<string, any> = {};
@@ -166,7 +185,7 @@ export const useRecommendations = (limit: number = 8) => {
           }))
         );
       } catch (e) {
-        console.error("Fallback recommendations failed:", e);
+        logger.error(e, "fallbackRecommendations");
       }
     } finally {
       setLoading(false);

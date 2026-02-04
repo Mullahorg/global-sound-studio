@@ -11,6 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PageMeta } from "@/components/seo/PageMeta";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("Contact");
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name is too long"),
@@ -73,12 +76,16 @@ const Contact = () => {
         message: result.data.message,
       });
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "contact_messages", "insert");
+        throw error;
+      }
       
       setIsSubmitted(true);
       setFormData({ name: "", email: "", subject: "", message: "" });
       toast({ title: "Message sent!", description: "We'll get back to you within 24 hours." });
     } catch (error: any) {
+      logger.error(error, "handleSubmit");
       toast({ 
         title: "Failed to send message", 
         description: error.message || "Please try again later.",

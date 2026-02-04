@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("useWishlist");
 
 interface WishlistItem {
   id: string;
@@ -28,10 +31,13 @@ export const useWishlist = () => {
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "wishlist", "select", { userId: user.id });
+        throw error;
+      }
       setWishlist(data || []);
-    } catch (err: any) {
-      console.error("Error fetching wishlist:", err);
+    } catch (err) {
+      logger.error(err, "fetchWishlist");
     } finally {
       setLoading(false);
     }
@@ -59,7 +65,10 @@ export const useWishlist = () => {
           beat_id: beatId,
         });
 
-        if (error) throw error;
+        if (error) {
+          logDatabaseError(error, "wishlist", "insert", { beatId });
+          throw error;
+        }
 
         setWishlist((prev) => [
           { id: crypto.randomUUID(), beat_id: beatId, created_at: new Date().toISOString() },
@@ -67,8 +76,8 @@ export const useWishlist = () => {
         ]);
         toast.success("Added to wishlist");
         return true;
-      } catch (err: any) {
-        console.error("Error adding to wishlist:", err);
+      } catch (err) {
+        logger.error(err, "addToWishlist", { beatId });
         toast.error("Failed to add to wishlist");
         return false;
       }
@@ -87,13 +96,16 @@ export const useWishlist = () => {
           .eq("user_id", user.id)
           .eq("beat_id", beatId);
 
-        if (error) throw error;
+        if (error) {
+          logDatabaseError(error, "wishlist", "delete", { beatId });
+          throw error;
+        }
 
         setWishlist((prev) => prev.filter((item) => item.beat_id !== beatId));
         toast.success("Removed from wishlist");
         return true;
-      } catch (err: any) {
-        console.error("Error removing from wishlist:", err);
+      } catch (err) {
+        logger.error(err, "removeFromWishlist", { beatId });
         toast.error("Failed to remove from wishlist");
         return false;
       }

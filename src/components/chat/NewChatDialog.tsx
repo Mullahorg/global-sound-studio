@@ -16,6 +16,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("NewChatDialog");
 
 interface User {
   id: string;
@@ -57,12 +60,19 @@ export const NewChatDialog = ({
         .select("id, full_name, avatar_url")
         .neq("id", user?.id || "");
 
-      if (error) throw error;
+      if (error) {
+        logDatabaseError(error, "public_profiles", "select");
+        throw error;
+      }
 
       // Fetch user roles
-      const { data: roles } = await supabase
+      const { data: roles, error: rolesError } = await supabase
         .from("user_roles")
         .select("user_id, role");
+
+      if (rolesError) {
+        logDatabaseError(rolesError, "user_roles", "select");
+      }
 
       const usersWithRoles = profiles?.map((profile) => ({
         ...profile,
@@ -71,7 +81,7 @@ export const NewChatDialog = ({
 
       setUsers(usersWithRoles);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      logger.error(error, "fetchUsers");
     } finally {
       setLoading(false);
     }

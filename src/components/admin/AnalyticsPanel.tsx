@@ -32,6 +32,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { format, subDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from "date-fns";
+import { logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("AnalyticsPanel");
 
 interface ChartData {
   name: string;
@@ -210,7 +213,7 @@ export const AnalyticsPanel = () => {
       setUserGrowth(userGrowthData);
 
     } catch (error) {
-      console.error("Analytics error:", error);
+      logger.error(error, "fetchAnalytics");
     }
 
     setLoading(false);

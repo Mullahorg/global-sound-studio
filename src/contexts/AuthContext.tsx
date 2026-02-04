@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { logAuthError, logDatabaseError, createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("AuthContext");
 
 interface AuthContextType {
   user: User | null;
@@ -22,6 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        logger.debug(`Auth state changed: ${event}`);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -29,7 +33,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        logAuthError(error, "getSession");
+      }
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -52,17 +59,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     });
 
-    if (!error && data.user) {
+    if (error) {
+      logAuthError(error, "signUp", { email });
+      return { error: error as Error };
+    }
+
+    if (data.user) {
       // Add user role after signup
       setTimeout(async () => {
-        await supabase.from("user_roles").insert({
+        const { error: roleError } = await supabase.from("user_roles").insert({
           user_id: data.user!.id,
           role: role
         });
+        if (roleError) {
+          logDatabaseError(roleError, "user_roles", "insert", { userId: data.user!.id, role });
+        }
       }, 0);
     }
 
-    return { error: error as Error | null };
+    return { error: null };
   };
 
   const signIn = async (email: string, password: string) => {
@@ -70,11 +85,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email,
       password,
     });
+    
+    if (error) {
+      logAuthError(error, "signIn", { email });
+    }
+    
     return { error: error as Error | null };
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      logAuthError(error, "signOut");
+    }
   };
 
   return (

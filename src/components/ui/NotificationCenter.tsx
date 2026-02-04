@@ -24,6 +24,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { createLogger } from "@/lib/errorLogger";
+
+const logger = createLogger("NotificationCenter");
 
 interface Notification {
   id: string;
@@ -121,7 +124,7 @@ export const NotificationCenter = () => {
       setNotifications(newNotifications);
       setHasNewNotifications(newNotifications.some((n) => !n.read));
     } catch (error) {
-      console.error("Error fetching notifications:", error);
+      logger.error(error, "generateNotifications");
     }
   }, [user]);
 
