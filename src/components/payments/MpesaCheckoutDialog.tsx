@@ -120,13 +120,18 @@ export const MpesaCheckoutDialog = ({
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
+      // Check if user is authenticated
+      if (!user) {
+        throw new Error("Please sign in to complete your purchase");
+      }
+      
       const response = await supabase.functions.invoke("mpesa-stk-push", {
         body: {
           phone_number: formattedPhone,
           amount: Math.round(amount),
           payment_type: paymentType,
           reference_id: referenceId,
-          user_id: user?.id,
+          user_id: user.id,
           metadata: metadata || {},
         },
       });
@@ -138,7 +143,14 @@ export const MpesaCheckoutDialog = ({
         setCheckoutRequestId(data.checkout_request_id);
         setStatus("waiting");
       } else {
-        throw new Error(data.error || "Failed to initiate payment");
+        // Improve error messages for common issues
+        let userMessage = data.error || "Failed to initiate payment";
+        if (userMessage.includes("Unauthorized")) {
+          userMessage = "Please sign in to complete your purchase";
+        } else if (userMessage.includes("not configured")) {
+          userMessage = "Payment system is being configured. Please try the Paybill option.";
+        }
+        throw new Error(userMessage);
       }
     } catch (error: any) {
       setStatus("failed");
