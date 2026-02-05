@@ -185,7 +185,7 @@ const Support = () => {
         name: formData.name,
         email: formData.email,
         category: formData.category,
-        order_id: formData.orderId || null,
+        order_id: formData.orderId && formData.orderId.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/) ? formData.orderId : null,
         message: formData.message,
         status: "open",
         priority: "normal",
