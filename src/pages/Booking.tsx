@@ -288,17 +288,23 @@ const Booking = () => {
         .eq("id", createdOrderId);
 
       // 3. Create manual payment record with valid order_id
-      await supabase.from("manual_payments").insert({
-        id: crypto.randomUUID(),
-        order_id: createdOrderId,
-        user_id: user?.id,
-        amount: totalPrice,
-        currency: "KES",
-        reference_code: `MPESA-${Date.now()}`,
-        status: "completed",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
+      // First verify the order exists
+      const { data: existingOrder } = await supabase
+        .from("orders")
+        .select("id")
+        .eq("id", createdOrderId)
+        .single();
+      
+      if (existingOrder) {
+        await supabase.from("manual_payments").insert({
+          order_id: createdOrderId,
+          user_id: user?.id,
+          amount: totalPrice,
+          currency: "KES",
+          reference_code: `MPESA-${Date.now()}`,
+          status: "completed",
+        });
+      }
 
       toast({
         title: "Booking confirmed!",

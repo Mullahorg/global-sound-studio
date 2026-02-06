@@ -106,9 +106,8 @@ export const PaybillBackupDialog = ({
         proofFileName = proofFile.name;
       }
 
-      // Create manual payment record
-      const { error } = await supabase.from("manual_payments").insert({
-        order_id: orderId,
+      // Create manual payment record - only include order_id if it's a valid UUID
+      const paymentData: any = {
         user_id: user.id,
         amount,
         currency: "KES",
@@ -116,7 +115,14 @@ export const PaybillBackupDialog = ({
         proof_url: proofUrl,
         proof_file_name: proofFileName,
         status: "pending",
-      });
+      };
+      
+      // Only add order_id if it's provided and valid
+      if (orderId && orderId.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+        paymentData.order_id = orderId;
+      }
+      
+      const { error } = await supabase.from("manual_payments").insert(paymentData);
 
       if (error) throw error;
 
