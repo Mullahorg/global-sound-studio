@@ -125,8 +125,7 @@ export const ChatMonitorPanel = () => {
       .select(`
         *,
         conversation_participants (
-          user_id,
-          profiles:user_id (full_name, avatar_url, email)
+          user_id
         )
       `)
       .order("updated_at", { ascending: false });
@@ -134,12 +133,32 @@ export const ChatMonitorPanel = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
+      // Collect unique participant user IDs and fetch profiles in one query
+      const allUserIds = Array.from(
+        new Set(
+          (convData || []).flatMap((conv: any) =>
+            conv.conversation_participants?.map((p: any) => p.user_id) || []
+          )
+        )
+      );
+
+      const profilesMap: Record<string, any> = {};
+      if (allUserIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id, full_name, avatar_url, email")
+          .in("id", allUserIds);
+        (profilesData || []).forEach((p) => {
+          profilesMap[p.id] = p;
+        });
+      }
+
       // Transform data
       const conversations = (convData || []).map((conv: any) => ({
         ...conv,
         participants: conv.conversation_participants?.map((p: any) => ({
           user_id: p.user_id,
-          profile: p.profiles,
+          profile: profilesMap[p.user_id] || null,
         })),
       }));
 
@@ -152,7 +171,7 @@ export const ChatMonitorPanel = () => {
             .eq("conversation_id", conv.id)
             .order("created_at", { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle();
 
           return {
             ...conv,
