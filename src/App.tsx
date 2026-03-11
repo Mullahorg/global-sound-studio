@@ -16,6 +16,7 @@ import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Analytics } from "@vercel/analytics/react";
 import { QuickAdminAccess } from "@/components/ui/QuickAdminAccess";
+import { MaintenanceGate } from "@/components/MaintenanceGate";
 
 // Eager loaded pages (critical path)
 import Index from "./pages/Index";
@@ -71,33 +72,35 @@ const App = () => (
                 <Analytics />
                 {/* Quick Admin Access Button (Floating) */}
                 <QuickAdminAccess />
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/beats" element={<Beats />} />
-                    <Route path="/booking" element={<Booking />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/studio" element={<Studio />} />
-                    <Route path="/admin" element={<Admin />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/services" element={<Services />} />
-                    <Route path="/library" element={<Library />} />
-                    <Route path="/outreach" element={<Outreach />} />
-                    <Route path="/wishlist" element={<Wishlist />} />
-                    <Route path="/privacy" element={<Privacy />} />
-                    <Route path="/terms" element={<Terms />} />
-                    <Route path="/licensing" element={<Licensing />} />
-                    <Route path="/support" element={<Support />} />
-                    <Route path="/chat" element={<Chat />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                    <Route path="/referrals" element={<Referrals />} />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Suspense>
+                <MaintenanceGate>
+                  <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="/beats" element={<Beats />} />
+                      <Route path="/booking" element={<Booking />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/studio" element={<Studio />} />
+                      <Route path="/admin" element={<Admin />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/services" element={<Services />} />
+                      <Route path="/library" element={<Library />} />
+                      <Route path="/outreach" element={<Outreach />} />
+                      <Route path="/wishlist" element={<Wishlist />} />
+                      <Route path="/privacy" element={<Privacy />} />
+                      <Route path="/terms" element={<Terms />} />
+                      <Route path="/licensing" element={<Licensing />} />
+                      <Route path="/support" element={<Support />} />
+                      <Route path="/chat" element={<Chat />} />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
+                      <Route path="/referrals" element={<Referrals />} />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </Suspense>
+                </MaintenanceGate>
               </ErrorBoundary>
             </TooltipProvider>
           </AudioQueueProvider>

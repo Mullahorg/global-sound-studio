@@ -437,6 +437,44 @@ export const SettingsPanel = () => {
         {/* Platform Settings */}
         <TabsContent value="platform">
           <div className="grid gap-6">
+            {/* Maintenance Mode */}
+            <Card className="border-amber-500/30 bg-amber-500/5">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      settings.maintenance_mode === "true" ? "bg-amber-500/20" : "bg-secondary"
+                    }`}>
+                      <AlertTriangle className={`w-6 h-6 ${
+                        settings.maintenance_mode === "true" ? "text-amber-500" : "text-muted-foreground"
+                      }`} />
+                    </div>
+                    <div>
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        Maintenance Mode
+                        <Badge className={settings.maintenance_mode === "true" ? "bg-amber-500/10 text-amber-500" : "bg-green-500/10 text-green-500"}>
+                          {settings.maintenance_mode === "true" ? "ON — Site Down" : "OFF — Live"}
+                        </Badge>
+                      </CardTitle>
+                      <CardDescription>
+                        When enabled, all visitors see a "Under Maintenance" page. Admins can still access the site.
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <Button
+                    variant={settings.maintenance_mode === "true" ? "destructive" : "outline"}
+                    onClick={() => {
+                      const newValue = settings.maintenance_mode === "true" ? "false" : "true";
+                      setSettings((prev) => ({ ...prev, maintenance_mode: newValue }));
+                      handleSave("maintenance_mode", newValue);
+                    }}
+                    disabled={saving}
+                  >
+                    {settings.maintenance_mode === "true" ? "Turn Off" : "Turn On"}
+                  </Button>
+                </div>
+              </CardHeader>
+            </Card>
             <Card className="border-border/50">
               <CardHeader>
                 <CardTitle className="text-lg">Branding & Contact</CardTitle>
