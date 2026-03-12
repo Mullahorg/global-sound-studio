@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Headphones, Mail, User, ArrowRight, Music } from "lucide-react";
+import { Headphones, Mail, User, ArrowRight, Music, CheckCircle2, MailCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,7 @@ import { PasswordInput } from "@/components/ui/PasswordInput";
 import { PageMeta } from "@/components/seo/PageMeta";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useReferral } from "@/hooks/useReferral";
 import { z } from "zod";
 
 const emailSchema = z.string().email("Please enter a valid email");
@@ -22,16 +23,29 @@ const Auth = () => {
   const [role, setRole] = useState<"artist" | "producer">("artist");
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [showVerification, setShowVerification] = useState(false);
+  const [searchParams] = useSearchParams();
   
   const { signIn, signUp, user } = useAuth();
+  const { validateReferralCode, recordReferral } = useReferral();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Get referral code from URL
+  const refCode = searchParams.get("ref");
 
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
     }
   }, [user, navigate]);
+
+  // If there's a ref code, default to signup mode
+  useEffect(() => {
+    if (refCode) {
+      setIsLogin(false);
+    }
+  }, [refCode]);
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -65,6 +79,8 @@ const Auth = () => {
             title: "Login failed",
             description: error.message === "Invalid login credentials" 
               ? "Invalid email or password. Please try again."
+              : error.message === "Email not confirmed"
+              ? "Please verify your email before signing in. Check your inbox."
               : error.message,
             variant: "destructive",
           });
@@ -75,20 +91,32 @@ const Auth = () => {
           });
         }
       } else {
-        const { error } = await signUp(email, password, fullName, role);
-        if (error) {
+        const result = await signUp(email, password, fullName, role);
+        if (result.error) {
           toast({
             title: "Sign up failed",
-            description: error.message.includes("already registered")
+            description: result.error.message.includes("already registered")
               ? "This email is already registered. Try logging in instead."
-              : error.message,
+              : result.error.message,
             variant: "destructive",
           });
         } else {
-          toast({
-            title: "Account created!",
-            description: "Welcome to WE Global Music Studio.",
-          });
+          // Process referral code if present
+          if (refCode) {
+            const codeData = await validateReferralCode(refCode);
+            if (codeData) {
+              await recordReferral(codeData.id, codeData.user_id);
+            }
+          }
+
+          if (result.needsVerification) {
+            setShowVerification(true);
+          } else {
+            toast({
+              title: "Account created!",
+              description: "Welcome to WE Global Music Studio.",
+            });
+          }
         }
       }
     } catch (err) {
@@ -101,6 +129,49 @@ const Auth = () => {
       setIsLoading(false);
     }
   };
+
+  // Email verification success screen
+  if (showVerification) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-8">
+        <PageMeta title="Verify Your Email" description="Check your email to verify your account." path="/auth" />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center max-w-md"
+        >
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/30">
+            <MailCheck className="w-10 h-10 text-white" />
+          </div>
+          <h2 className="font-display text-3xl font-bold text-foreground mb-3">
+            Check Your Email
+          </h2>
+          <p className="text-muted-foreground mb-6 leading-relaxed">
+            We've sent a verification link to <strong className="text-foreground">{email}</strong>. 
+            Click the link in the email to activate your account.
+          </p>
+          <div className="p-4 rounded-xl bg-secondary/50 border border-border/50 mb-6">
+            <div className="flex items-start gap-3 text-left">
+              <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+              <div className="text-sm text-muted-foreground">
+                <p className="font-medium text-foreground mb-1">Didn't receive it?</p>
+                <p>Check your spam folder. The email may take a few minutes to arrive.</p>
+              </div>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowVerification(false);
+              setIsLogin(true);
+            }}
+          >
+            Back to Sign In
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -167,6 +238,12 @@ const Auth = () => {
                 ? "Sign in to access your dashboard" 
                 : "Create your account to get started"}
             </p>
+            {refCode && !isLogin && (
+              <p className="text-sm text-primary mt-2 flex items-center justify-center gap-1">
+                <CheckCircle2 className="w-4 h-4" />
+                Referred by code: {refCode}
+              </p>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -287,6 +364,7 @@ const Auth = () => {
               onClick={() => {
                 setIsLogin(!isLogin);
                 setErrors({});
+                setShowVerification(false);
               }}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >

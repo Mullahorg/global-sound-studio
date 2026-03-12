@@ -20,6 +20,10 @@ export interface RolePermissions {
   canViewAnalytics: boolean;
 }
 
+/**
+ * Hook to fetch the current user's role from user_roles table (single source of truth).
+ * Never reads role from profiles table to prevent privilege escalation.
+ */
 export function useUserRole() {
   const { user } = useAuth();
   const [role, setRole] = useState<AppRole>(null);
@@ -34,36 +38,17 @@ export function useUserRole() {
       }
 
       try {
-        // Check profiles table (where your role actually is)
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .maybeSingle();
-
-        if (profileError) {
-          logDatabaseError(profileError, "profiles", "select", { context: "fetch role", userId: user.id });
-        }
-
-        // If role is in profiles table, use it
-        if (profile?.role) {
-          setRole(profile.role as AppRole);
-          setLoading(false);
-          return;
-        }
-
-        // Fallback to user_roles table (legacy)
-        const { data: userRole, error: userRoleError } = await supabase
+        const { data: userRole, error } = await supabase
           .from("user_roles")
           .select("role")
           .eq("user_id", user.id)
           .maybeSingle();
 
-        if (userRoleError) {
-          logDatabaseError(userRoleError, "user_roles", "select", { context: "fetch role fallback", userId: user.id });
+        if (error) {
+          logDatabaseError(error, "user_roles", "select", { context: "fetch role", userId: user.id });
         }
 
-        setRole(userRole?.role as AppRole || null);
+        setRole((userRole?.role as AppRole) || null);
       } catch (error) {
         logger.error(error, "fetchRole");
         setRole(null);
@@ -76,16 +61,13 @@ export function useUserRole() {
   }, [user]);
 
   const permissions: RolePermissions = {
-    // All logged-in users
     canAccessDashboard: !!user,
     canViewReferrals: !!user,
-    
-    // Producer & Admin only
     canUploadBeats: role === "producer" || role === "admin",
     canManageBookings: role === "producer" || role === "admin",
     canViewFranchise: role === "producer" || role === "admin",
     canRequestPayouts: role === "producer" || role === "admin",
-    canAccessAdmin: role === "admin", // Only admin can access admin panel
+    canAccessAdmin: role === "admin",
     canManageContent: role === "admin",
     canManageUsers: role === "admin",
     canViewAnalytics: role === "admin",

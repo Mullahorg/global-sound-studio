@@ -9,9 +9,10 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role: "artist" | "producer") => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string, role: "artist" | "producer") => Promise<{ error: Error | null; needsVerification?: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  changePassword: (newPassword: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -55,6 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
+          signup_role: role, // Store in metadata for post-verification role assignment
         }
       }
     });
@@ -64,20 +66,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { error: error as Error };
     }
 
+    // Insert role immediately (awaited, no setTimeout race condition)
     if (data.user) {
-      // Add user role after signup
-      setTimeout(async () => {
-        const { error: roleError } = await supabase.from("user_roles").insert({
-          user_id: data.user!.id,
-          role: role
-        });
-        if (roleError) {
-          logDatabaseError(roleError, "user_roles", "insert", { userId: data.user!.id, role });
-        }
-      }, 0);
+      const { error: roleError } = await supabase.from("user_roles").insert({
+        user_id: data.user.id,
+        role: role
+      });
+      if (roleError) {
+        logDatabaseError(roleError, "user_roles", "insert", { userId: data.user.id, role });
+      }
     }
 
-    return { error: null };
+    // Check if email confirmation is required
+    const needsVerification = data.user && !data.session;
+
+    return { error: null, needsVerification };
   };
 
   const signIn = async (email: string, password: string) => {
@@ -100,8 +103,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const changePassword = async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      logAuthError(error, "changePassword");
+    }
+    return { error: error as Error | null };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, changePassword }}>
       {children}
     </AuthContext.Provider>
   );
