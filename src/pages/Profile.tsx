@@ -335,9 +335,10 @@ const Profile = () => {
 
             {/* Tabs */}
             <Tabs defaultValue="personal" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="personal">Personal Info</TabsTrigger>
                 <TabsTrigger value="social">Social Links</TabsTrigger>
+                <TabsTrigger value="security">Security</TabsTrigger>
               </TabsList>
 
               {/* Personal Info Tab */}
