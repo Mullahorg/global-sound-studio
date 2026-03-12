@@ -528,6 +528,11 @@ const Profile = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
+
+              {/* Security Tab - Password Change */}
+              <TabsContent value="security">
+                <SecurityTab />
+              </TabsContent>
             </Tabs>
           </motion.div>
         </div>
@@ -535,6 +540,71 @@ const Profile = () => {
 
       <Footer />
     </div>
+  );
+};
+
+/** Password change section */
+const SecurityTab = () => {
+  const { changePassword } = useAuth();
+  const { toast } = useToast();
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (newPassword.length < 6) {
+      toast({ title: "Password too short", description: "Must be at least 6 characters", variant: "destructive" });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Passwords don't match", description: "Please make sure both fields match", variant: "destructive" });
+      return;
+    }
+
+    setSaving(true);
+    const { error } = await changePassword(newPassword);
+    setSaving(false);
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Password updated!", description: "Your password has been changed successfully." });
+      setNewPassword("");
+      setConfirmPassword("");
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Change Password</CardTitle>
+        <CardDescription>Update your account password</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 max-w-md">
+        <div className="space-y-2">
+          <Label htmlFor="new-password">New Password</Label>
+          <PasswordInput
+            id="new-password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="Enter new password"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirm-password">Confirm Password</Label>
+          <PasswordInput
+            id="confirm-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm new password"
+          />
+        </div>
+        <Button onClick={handleChangePassword} disabled={saving} variant="hero">
+          <Save className="w-4 h-4 mr-2" />
+          {saving ? "Updating..." : "Update Password"}
+        </Button>
+      </CardContent>
+    </Card>
   );
 };
 
