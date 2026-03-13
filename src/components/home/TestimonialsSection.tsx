@@ -3,21 +3,21 @@ import { Star, Quote } from "lucide-react";
 
 const testimonials = [
   {
-    quote: "WE Global transformed our sound completely. The attention to detail and creative input from their team took our album to the next level.",
+    quote: "WE Global transformed our sound completely. The attention to detail and creative input took our album to the next level.",
     author: "Marcus Chen",
     role: "Grammy-Nominated Artist",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
     rating: 5,
   },
   {
-    quote: "The remote session experience was seamless. It felt like we were all in the same room, and the final mix exceeded our expectations.",
+    quote: "The remote session experience was seamless. It felt like we were in the same room, and the final mix exceeded expectations.",
     author: "Sarah Williams",
     role: "Lead Singer, Aurora Band",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
     rating: 5,
   },
   {
-    quote: "Their beat licensing platform is incredibly intuitive. Found the perfect production for our ad campaign in minutes.",
+    quote: "Their beat licensing platform is incredibly intuitive. Found the perfect production for our campaign in minutes.",
     author: "David Park",
     role: "Creative Director, Studio X",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
@@ -27,64 +27,42 @@ const testimonials = [
 
 export const TestimonialsSection = () => {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/10 to-background" />
-
-      <div className="container mx-auto px-6 relative z-10">
-        {/* Header */}
+    <section className="py-20 md:py-28">
+      <div className="container mx-auto px-6">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <span className="text-sm font-medium text-primary uppercase tracking-wider">
-            Client Stories
-          </span>
-          <h2 className="font-display text-4xl md:text-5xl font-bold mt-4">
-            What Artists <span className="gradient-text">Say</span>
+          <p className="text-xs font-medium text-primary uppercase tracking-wider mb-3">Client Stories</p>
+          <h2 className="font-display text-3xl md:text-4xl font-bold">
+            What Artists <span className="text-primary">Say</span>
           </h2>
         </motion.div>
 
-        {/* Testimonials Grid */}
-        <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
+        <div className="grid md:grid-cols-3 gap-4">
+          {testimonials.map((t, index) => (
             <motion.div
-              key={testimonial.author}
-              initial={{ opacity: 0, y: 30 }}
+              key={t.author}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.15 }}
-              className="relative group"
+              transition={{ delay: index * 0.1 }}
             >
-              <div className="h-full p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/30 transition-all duration-500">
-                {/* Quote Icon */}
-                <Quote className="w-10 h-10 text-primary/20 mb-6" />
-
-                {/* Rating */}
-                <div className="flex gap-1 mb-6">
-                  {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+              <div className="h-full p-6 rounded-lg border border-border/30">
+                <Quote className="w-6 h-6 text-primary/20 mb-4" />
+                <div className="flex gap-0.5 mb-4">
+                  {Array.from({ length: t.rating }).map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />
                   ))}
                 </div>
-
-                {/* Quote */}
-                <p className="text-muted-foreground leading-relaxed mb-8">
-                  "{testimonial.quote}"
-                </p>
-
-                {/* Author */}
-                <div className="flex items-center gap-4">
-                  <img
-                    src={testimonial.avatar}
-                    alt={testimonial.author}
-                    className="w-12 h-12 rounded-full object-cover ring-2 ring-border"
-                  />
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6">"{t.quote}"</p>
+                <div className="flex items-center gap-3">
+                  <img src={t.avatar} alt={t.author} className="w-9 h-9 rounded-full object-cover" />
                   <div>
-                    <p className="font-semibold text-foreground">{testimonial.author}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    <p className="text-sm font-medium text-foreground">{t.author}</p>
+                    <p className="text-xs text-muted-foreground">{t.role}</p>
                   </div>
                 </div>
               </div>

@@ -3,132 +3,58 @@ import { Link } from "react-router-dom";
 import { Music, Headphones, Radio, Video, Mic2, Sliders, ArrowRight } from "lucide-react";
 
 const services = [
-  {
-    icon: Music,
-    title: "Music Production",
-    description: "Full-scale production from concept to master. We bring your vision to life with industry-leading sound.",
-    gradient: "from-primary to-primary/50",
-  },
-  {
-    icon: Sliders,
-    title: "Mixing & Mastering",
-    description: "Professional mixing and mastering that makes your tracks radio-ready and streaming-optimized.",
-    gradient: "from-accent to-accent/50",
-  },
-  {
-    icon: Radio,
-    title: "Beat Licensing",
-    description: "Browse our exclusive beat catalog. Instant licensing with flexible terms for any project size.",
-    gradient: "from-waveform-secondary to-waveform-secondary/50",
-  },
-  {
-    icon: Headphones,
-    title: "Remote Sessions",
-    description: "Collaborate with our producers from anywhere in the world. Real-time sessions, seamless workflow.",
-    gradient: "from-primary to-accent",
-  },
-  {
-    icon: Mic2,
-    title: "Songwriting",
-    description: "Tap into our network of Grammy-winning songwriters to craft your next hit.",
-    gradient: "from-accent to-waveform-secondary",
-  },
-  {
-    icon: Video,
-    title: "Sound for Film",
-    description: "Cinematic scores, soundtracks, and audio post-production for film, TV, and advertising.",
-    gradient: "from-waveform-secondary to-primary",
-  },
+  { icon: Music, title: "Music Production", description: "Full-scale production from concept to master." },
+  { icon: Sliders, title: "Mixing & Mastering", description: "Radio-ready and streaming-optimized sound." },
+  { icon: Radio, title: "Beat Licensing", description: "Browse and license beats with flexible terms." },
+  { icon: Headphones, title: "Remote Sessions", description: "Collaborate with producers from anywhere." },
+  { icon: Mic2, title: "Songwriting", description: "Expert songwriters to craft your next hit." },
+  { icon: Video, title: "Sound for Film", description: "Scores and audio post-production for media." },
 ];
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut" as const },
-  },
-};
 
 export const ServicesSection = () => {
   return (
-    <section id="services" className="py-24 md:py-32 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-secondary/20 via-background to-background" />
-      
-      <div className="container mx-auto px-6 relative z-10">
-        {/* Header */}
+    <section id="services" className="py-20 md:py-28">
+      <div className="container mx-auto px-6">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-14"
         >
-          <span className="text-sm font-medium text-primary uppercase tracking-wider">
-            What We Offer
-          </span>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6">
-            Production <span className="gradient-text">Services</span>
+          <p className="text-xs font-medium text-primary uppercase tracking-wider mb-3">What We Offer</p>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
+            Production <span className="text-primary">Services</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            From initial concept to final master, we provide end-to-end music production 
-            services tailored to artists, labels, and brands worldwide.
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            End-to-end music production services for artists, labels, and brands.
           </p>
         </motion.div>
 
-        {/* Services Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {services.map((service, index) => (
             <Link key={service.title} to="/services">
               <motion.div
-                variants={itemVariants}
-                whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className="group relative p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/30 transition-all duration-500 h-full cursor-pointer"
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.05 }}
+                className="group p-6 rounded-lg border border-border/30 hover:border-border transition-all"
               >
-                {/* Hover Glow */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                
-                <div className="relative z-10">
-                  {/* Icon */}
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${service.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <service.icon className="w-7 h-7 text-primary-foreground" />
-                  </div>
-
-                  {/* Content */}
-                  <h3 className="font-display text-xl font-semibold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
-                    {service.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {service.description}
-                  </p>
-
-                  {/* Learn More Link */}
-                  <div className="mt-6 flex items-center gap-2 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span>Learn More</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
+                <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center mb-4">
+                  <service.icon className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-display text-base font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                  {service.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{service.description}</p>
+                <div className="mt-4 flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span>Learn more</span>
+                  <ArrowRight className="w-3 h-3" />
                 </div>
               </motion.div>
             </Link>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
