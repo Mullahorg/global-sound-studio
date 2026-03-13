@@ -1,101 +1,62 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Star, Rocket, Users, ArrowRight, Sparkles } from "lucide-react";
+import { Star, Rocket, Users, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
+const programs = [
+  { icon: Star, title: "Talent Discovery", description: "Finding exceptional emerging artists worldwide." },
+  { icon: Rocket, title: "Skill Development", description: "Mentorship, workshops, and studio access." },
+  { icon: Users, title: "Global Network", description: "Connect with artists and industry professionals." },
+];
 
 export const OutreachSection = () => {
-  const programs = [
-    {
-      icon: Star,
-      title: "Talent Discovery",
-      description: "We actively search for exceptional emerging artists and producers worldwide.",
-      color: "primary",
-    },
-    {
-      icon: Rocket,
-      title: "Skill Development",
-      description: "Accelerate your growth with mentorship, workshops, and studio access.",
-      color: "accent",
-    },
-    {
-      icon: Users,
-      title: "Global Network",
-      description: "Connect with artists, producers, and industry professionals globally.",
-      color: "primary",
-    },
-  ];
-
   return (
-    <section className="py-24 bg-gradient-to-b from-background to-card relative overflow-hidden">
-      {/* Background Elements */}
-      <motion.div 
-        className="absolute top-20 left-1/4 w-80 h-80 bg-primary/5 rounded-full blur-[100px]"
-        animate={{ scale: [1, 1.2, 1] }}
-        transition={{ duration: 8, repeat: Infinity }}
-      />
-      <motion.div 
-        className="absolute bottom-20 right-1/4 w-64 h-64 bg-accent/5 rounded-full blur-[80px]"
-        animate={{ scale: [1.2, 1, 1.2] }}
-        transition={{ duration: 6, repeat: Infinity }}
-      />
-
-      <div className="container mx-auto px-6 relative z-10">
+    <section className="py-20 md:py-28 border-t border-border/20">
+      <div className="container mx-auto px-6">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            <Sparkles className="w-3 h-3 mr-1" />
-            Outreach Programs
-          </Badge>
-          <h2 className="font-display text-3xl md:text-5xl font-bold mb-6">
-            <span className="text-foreground">Supporting </span>
-            <span className="gradient-text">Tomorrow's Stars</span>
+          <p className="text-xs font-medium text-primary uppercase tracking-wider mb-3">Outreach Programs</p>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
+            Supporting <span className="text-primary">Tomorrow's Stars</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Our outreach initiatives are designed to discover, nurture, and elevate 
-            emerging talent from underrepresented communities worldwide.
+          <p className="text-muted-foreground max-w-lg mx-auto">
+            Discover, nurture, and elevate emerging talent from communities worldwide.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {programs.map((program, index) => (
+        <div className="grid md:grid-cols-3 gap-4 mb-10">
+          {programs.map((p, i) => (
             <motion.div
-              key={program.title}
-              initial={{ opacity: 0, y: 30 }}
+              key={p.title}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group"
+              transition={{ delay: i * 0.05 }}
+              className="p-6 rounded-lg border border-border/30"
             >
-              <div className="p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/30 transition-all h-full">
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 ${
-                  program.color === "primary" ? "bg-primary/10" : "bg-accent/10"
-                } group-hover:scale-110 transition-transform`}>
-                  <program.icon className={`w-7 h-7 ${
-                    program.color === "primary" ? "text-primary" : "text-accent"
-                  }`} />
-                </div>
-                <h3 className="font-display text-xl font-semibold mb-3">{program.title}</h3>
-                <p className="text-muted-foreground">{program.description}</p>
+              <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center mb-4">
+                <p.icon className="w-5 h-5 text-primary" />
               </div>
+              <h3 className="font-display text-base font-semibold mb-2">{p.title}</h3>
+              <p className="text-sm text-muted-foreground">{p.description}</p>
             </motion.div>
           ))}
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           className="text-center"
         >
           <Link to="/outreach">
-            <Button variant="hero" size="lg" className="group">
+            <Button variant="default" size="lg" className="group">
               Explore Programs
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
             </Button>
           </Link>
         </motion.div>

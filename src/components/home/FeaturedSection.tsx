@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Play, Pause } from "lucide-react";
+import { Play } from "lucide-react";
 import { useState } from "react";
 
 const featuredReleases = [
@@ -30,59 +30,48 @@ const featuredReleases = [
   },
 ];
 
-const ReleaseCard = ({ release, index }: { release: typeof featuredReleases[0]; index: number }) => {
+const ReleaseCard = ({ release, index }: { release: (typeof featuredReleases)[0]; index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: index * 0.15 }}
+      transition={{ delay: index * 0.1 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative"
+      className="group"
     >
-      {/* Card */}
-      <div className="relative overflow-hidden rounded-2xl bg-card border border-border/50 hover:border-primary/30 transition-all duration-500">
-        {/* Cover Image */}
+      <div className="relative overflow-hidden rounded-lg border border-border/30 hover:border-border transition-all">
         <div className="relative aspect-square overflow-hidden">
           <img
             src={release.cover}
             alt={release.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          
-          {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: isHovered ? 1 : 0 }}
-            className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent flex items-center justify-center"
+            className="absolute inset-0 bg-background/60 flex items-center justify-center"
           >
             <motion.button
-              initial={{ scale: 0 }}
-              animate={{ scale: isHovered ? 1 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/40 hover:scale-110 transition-transform"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: isHovered ? 1 : 0.8 }}
+              className="w-12 h-12 rounded-full bg-primary flex items-center justify-center"
             >
-              <Play className="w-6 h-6 text-primary-foreground ml-1" />
+              <Play className="w-5 h-5 text-primary-foreground ml-0.5" />
             </motion.button>
           </motion.div>
-
-          {/* Genre Badge */}
-          <div className="absolute top-4 left-4">
-            <span className="px-3 py-1 rounded-full text-xs font-medium bg-background/80 backdrop-blur-sm text-foreground border border-border/50">
+          <div className="absolute top-3 left-3">
+            <span className="px-2 py-1 rounded text-[10px] font-medium bg-background/80 text-foreground border border-border/30">
               {release.genre}
             </span>
           </div>
         </div>
-
-        {/* Info */}
-        <div className="p-5">
-          <h3 className="font-display font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
-            {release.title}
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1">{release.artist}</p>
+        <div className="p-4">
+          <h3 className="font-display font-semibold text-sm text-foreground">{release.title}</h3>
+          <p className="text-xs text-muted-foreground mt-1">{release.artist}</p>
         </div>
       </div>
     </motion.div>
@@ -91,39 +80,26 @@ const ReleaseCard = ({ release, index }: { release: typeof featuredReleases[0]; 
 
 export const FeaturedSection = () => {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden">
-      <div className="container mx-auto px-6 relative z-10">
-        {/* Header */}
+    <section className="py-20 md:py-28">
+      <div className="container mx-auto px-6">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col md:flex-row md:items-end md:justify-between mb-12"
+          className="flex flex-col md:flex-row md:items-end md:justify-between mb-10"
         >
           <div>
-            <span className="text-sm font-medium text-accent uppercase tracking-wider">
-              Our Portfolio
-            </span>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-4">
-              Featured <span className="gradient-text">Releases</span>
+            <p className="text-xs font-medium text-primary uppercase tracking-wider mb-2">Portfolio</p>
+            <h2 className="font-display text-3xl md:text-4xl font-bold">
+              Featured <span className="text-primary">Releases</span>
             </h2>
           </div>
-          <Link to="/beats">
-            <motion.span
-              whileHover={{ x: 5 }}
-              className="mt-4 md:mt-0 text-sm font-medium text-primary flex items-center gap-2"
-            >
-              View All Releases
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </motion.span>
+          <Link to="/beats" className="mt-3 md:mt-0 text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+            View all →
           </Link>
         </motion.div>
 
-        {/* Releases Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {featuredReleases.map((release, index) => (
             <ReleaseCard key={release.title} release={release} index={index} />
           ))}
