@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Play, Pause, Filter, Clock, Calendar, Users, Award, Music2 } from "lucide-react";
+import { Play, Pause, Filter, Clock, Calendar, Users, Award, Music2, Download, ShoppingBag, Loader2 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 
 interface Project {
   id: string;
@@ -22,6 +25,20 @@ interface Project {
     full_name: string | null;
     avatar_url: string | null;
   };
+}
+
+interface Purchase {
+  id: string;
+  license_type: string;
+  price_paid: number;
+  purchased_at: string;
+  beat: {
+    id: string;
+    title: string;
+    cover_url: string | null;
+    genre: string;
+    bpm: number;
+  } | null;
 }
 
 interface CompletedWork {
@@ -111,6 +128,10 @@ const Library = () => {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [purchasesLoading, setPurchasesLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -133,6 +154,57 @@ const Library = () => {
 
     fetchProjects();
   }, []);
+
+  useEffect(() => {
+    const fetchPurchases = async () => {
+      if (!user) {
+        setPurchases([]);
+        setPurchasesLoading(false);
+        return;
+      }
+      setPurchasesLoading(true);
+      const { data, error } = await supabase
+        .from("beat_purchases")
+        .select(
+          "id, license_type, price_paid, purchased_at, beat:beats(id, title, cover_url, genre, bpm)"
+        )
+        .eq("buyer_id", user.id)
+        .order("purchased_at", { ascending: false });
+      if (!error && data) setPurchases(data as unknown as Purchase[]);
+      setPurchasesLoading(false);
+    };
+    fetchPurchases();
+  }, [user]);
+
+  const handleDownload = async (beatId: string, beatTitle: string) => {
+    if (!user) {
+      toast({ title: "Sign in required", description: "Please sign in to download" });
+      return;
+    }
+    setDownloadingId(beatId);
+    try {
+      const { data, error } = await supabase.functions.invoke("beat-download", {
+        body: { beat_id: beatId },
+      });
+      if (error) throw error;
+      if (!data?.download_url) throw new Error("No download URL returned");
+      const a = document.createElement("a");
+      a.href = data.download_url;
+      a.download = `${beatTitle}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast({ title: "Download started", description: beatTitle });
+    } catch (err: any) {
+      toast({
+        title: "Download failed",
+        description: err.message ?? "Please try again",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const filteredWorks = selectedGenre === "All" 
     ? sampleWorks 
@@ -194,6 +266,7 @@ const Library = () => {
             <TabsList className="bg-secondary mb-8">
               <TabsTrigger value="works">Released Works</TabsTrigger>
               <TabsTrigger value="projects">Studio Projects</TabsTrigger>
+              {user && <TabsTrigger value="purchases">My Purchases</TabsTrigger>}
             </TabsList>
 
             <TabsContent value="works">
@@ -346,6 +419,78 @@ const Library = () => {
                 </div>
               )}
             </TabsContent>
+
+            {user && (
+              <TabsContent value="purchases">
+                {purchasesLoading ? (
+                  <div className="text-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
+                  </div>
+                ) : purchases.length > 0 ? (
+                  <div className="space-y-4">
+                    {purchases.map((p) => (
+                      <motion.div
+                        key={p.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-4 sm:p-6 rounded-xl bg-card border border-border/50 flex flex-col sm:flex-row sm:items-center gap-4"
+                      >
+                        <div className="w-16 h-16 rounded-lg bg-secondary overflow-hidden shrink-0 flex items-center justify-center">
+                          {p.beat?.cover_url ? (
+                            <img
+                              src={p.beat.cover_url}
+                              alt={p.beat.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Music2 className="w-6 h-6 text-muted-foreground" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-display font-semibold text-lg truncate">
+                            {p.beat?.title ?? "Beat unavailable"}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-muted-foreground">
+                            {p.beat?.genre && (
+                              <span className="capitalize">{p.beat.genre.replace("_", " ")}</span>
+                            )}
+                            {p.beat?.bpm && <span>· {p.beat.bpm} BPM</span>}
+                            <span>· {format(new Date(p.purchased_at), "MMM d, yyyy")}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Badge variant="outline" className="capitalize">
+                            {p.license_type}
+                          </Badge>
+                          <Button
+                            size="sm"
+                            disabled={!p.beat || downloadingId === p.beat.id}
+                            onClick={() => p.beat && handleDownload(p.beat.id, p.beat.title)}
+                          >
+                            {downloadingId === p.beat?.id ? (
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            ) : (
+                              <Download className="w-4 h-4 mr-2" />
+                            )}
+                            Download
+                          </Button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <ShoppingBag className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="font-display text-xl font-semibold mb-2">
+                      No purchases yet
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Browse the beat store to find your next track.
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </main>
