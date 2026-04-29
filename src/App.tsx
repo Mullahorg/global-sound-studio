@@ -13,6 +13,7 @@ import { QuickActions } from "@/components/ui/QuickActions";
 import { PWAInstallPrompt } from "@/components/ui/PWAInstallPrompt";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { OnlineIndicator } from "@/components/ui/OnlineIndicator";
+import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Analytics } from "@vercel/analytics/react";
@@ -66,6 +67,7 @@ const App = () => (
               <ErrorBoundary>
                 <Toaster />
                 <Sonner />
+                <ScrollProgress />
                 <CommandPalette />
                 <QuickActions />
                 <PWAInstallPrompt />

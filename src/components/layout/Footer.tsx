@@ -1,94 +1,139 @@
 import { forwardRef } from "react";
 import { Link } from "react-router-dom";
-import { Mail, Phone } from "lucide-react";
+import { Mail, Phone, ArrowUpRight, Instagram, Twitter, Youtube } from "lucide-react";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
-const quickLinks = [
-  { label: "Beats", href: "/beats" },
-  { label: "Studio", href: "/studio" },
-  { label: "Services", href: "/services" },
-  { label: "Book Session", href: "/booking" },
+const navColumns = [
+  {
+    label: "Studio",
+    items: [
+      { label: "Beats", href: "/beats" },
+      { label: "Studio", href: "/studio" },
+      { label: "Services", href: "/services" },
+      { label: "Book Session", href: "/booking" },
+    ],
+  },
+  {
+    label: "Catalogue",
+    items: [
+      { label: "Library", href: "/library" },
+      { label: "Outreach", href: "/outreach" },
+      { label: "Wishlist", href: "/wishlist" },
+      { label: "Referrals", href: "/referrals" },
+    ],
+  },
+  {
+    label: "Resources",
+    items: [
+      { label: "Support", href: "/support" },
+      { label: "Licensing", href: "/licensing" },
+      { label: "Contact", href: "/contact" },
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+    ],
+  },
 ];
 
-const resourceLinks = [
-  { label: "Support", href: "/support" },
-  { label: "Licensing", href: "/licensing" },
-  { label: "Contact", href: "/contact" },
+const socials = [
+  { icon: Instagram, label: "Instagram", href: "https://instagram.com" },
+  { icon: Twitter, label: "Twitter", href: "https://twitter.com" },
+  { icon: Youtube, label: "YouTube", href: "https://youtube.com" },
 ];
 
-const legalLinks = [
-  { label: "Privacy", href: "/privacy" },
-  { label: "Terms", href: "/terms" },
-];
-
-export const Footer = forwardRef<HTMLElement>((props, ref) => {
+export const Footer = forwardRef<HTMLElement>((_, ref) => {
   const { settings } = usePlatformSettings();
+  const year = new Date().getFullYear();
 
   return (
-    <footer ref={ref} className="border-t border-border/30">
-      <div className="container mx-auto px-4 sm:px-6 py-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-          {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
-            <span className="font-display font-semibold text-foreground text-sm">{settings.site_name}</span>
-            <p className="text-xs text-muted-foreground mt-2 max-w-xs leading-relaxed">
-              Professional music production, mixing, mastering, and beat licensing.
+    <footer ref={ref} className="relative border-t border-border bg-background">
+      <div className="container mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-10">
+        <div className="grid grid-cols-12 gap-6 md:gap-8 mb-16 md:mb-24">
+          <div className="col-span-12 lg:col-span-7">
+            <p className="editorial-eyebrow mb-6">§ Coda</p>
+            <h2 className="display-headline text-4xl sm:text-5xl md:text-6xl text-foreground max-w-2xl">
+              Sound, <span className="display-italic text-primary">crafted</span> for those
+              who refuse the average.
+            </h2>
+            <p className="mt-8 max-w-md text-sm text-muted-foreground leading-relaxed">
+              A borderless production house. Studio sessions, mixing, mastering, and licensable beats — engineered with care.
             </p>
-          </div>
 
-          {/* Links */}
-          <div>
-            <h4 className="text-xs font-medium text-foreground uppercase tracking-wider mb-3">Links</h4>
-            <nav className="space-y-2">
-              {quickLinks.map((link) => (
-                <Link key={link.label} to={link.href} className="block text-xs text-muted-foreground hover:text-foreground transition-colors">
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h4 className="text-xs font-medium text-foreground uppercase tracking-wider mb-3">Resources</h4>
-            <nav className="space-y-2">
-              {resourceLinks.map((link) => (
-                <Link key={link.label} to={link.href} className="block text-xs text-muted-foreground hover:text-foreground transition-colors">
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          {/* Contact */}
-          <div className="col-span-2 md:col-span-1">
-            <h4 className="text-xs font-medium text-foreground uppercase tracking-wider mb-3">Contact</h4>
-            <div className="space-y-2">
-              <a href={`mailto:${settings.contact_email}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
-                <Mail className="w-3 h-3 shrink-0" />
-                <span className="truncate">{settings.contact_email || "hello@studio.com"}</span>
-              </a>
-              <a href={`tel:${settings.contact_phone}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
-                <Phone className="w-3 h-3 shrink-0" />
-                <span>{settings.contact_phone || "+254 700 000 000"}</span>
-              </a>
+            <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:items-center">
+              <Link
+                to="/booking"
+                className="group inline-flex items-center justify-between gap-6 px-5 py-4 border border-foreground bg-foreground text-background hover:bg-primary hover:border-primary hover:text-primary-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em]"
+              >
+                Book a Session
+                <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </Link>
+              <Link
+                to="/contact"
+                className="group inline-flex items-center justify-between gap-6 px-5 py-4 border border-border hover:border-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em] text-foreground"
+              >
+                Talk to Us
+                <ArrowUpRight className="w-4 h-4 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              </Link>
             </div>
+          </div>
+
+          <div className="col-span-12 lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 gap-8">
+            {navColumns.map((col) => (
+              <div key={col.label}>
+                <p className="editorial-label mb-4">{col.label}</p>
+                <nav className="space-y-2.5">
+                  {col.items.map((item) => (
+                    <Link
+                      key={item.label}
+                      to={item.href}
+                      className="block text-sm text-foreground/80 hover:text-primary transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="h-px bg-border/20 mb-4" />
+        <div className="relative mb-8 overflow-hidden">
+          <div className="editorial-rule" />
+          <h3
+            aria-hidden
+            className="display-mega text-foreground select-none mt-6"
+            style={{ fontSize: "clamp(3rem, 16vw, 16rem)", lineHeight: 0.85 }}
+          >
+            {(settings.site_name || "WE Global").toUpperCase()}
+          </h3>
+          <div className="editorial-rule mt-2" />
+        </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} {settings.site_name}
-          </p>
-          <nav className="flex items-center gap-4">
-            {legalLinks.map((link) => (
-              <Link key={link.label} to={link.href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                {link.label}
-              </Link>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-6">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            <span>© {year} {settings.site_name || "WE Global Studio"}</span>
+            <span>All Rights Reserved</span>
+            <a href={`mailto:${settings.contact_email}`} className="hover:text-foreground transition-colors inline-flex items-center gap-2">
+              <Mail className="w-3 h-3" /> {settings.contact_email || "hello@studio.com"}
+            </a>
+            <a href={`tel:${settings.contact_phone}`} className="hover:text-foreground transition-colors inline-flex items-center gap-2">
+              <Phone className="w-3 h-3" /> {settings.contact_phone || "+254 700 000 000"}
+            </a>
+          </div>
+
+          <div className="flex items-center gap-1">
+            {socials.map((s) => (
+              <a
+                key={s.label}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.label}
+                className="w-9 h-9 flex items-center justify-center border border-border hover:border-foreground hover:text-primary transition-colors"
+              >
+                <s.icon className="w-3.5 h-3.5" />
+              </a>
             ))}
-          </nav>
+          </div>
         </div>
       </div>
     </footer>

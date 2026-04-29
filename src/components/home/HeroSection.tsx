@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Play, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowUpRight } from "lucide-react";
 import { WaveformVisualizer } from "@/components/ui/WaveformVisualizer";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const ease = [0.25, 0.1, 0.25, 1];
 
 export const HeroSection = () => {
   const { settings, loading } = usePlatformSettings();
@@ -14,107 +15,148 @@ export const HeroSection = () => {
   const secondPart = titleParts[1]?.replace(".", "") || "One Studio";
 
   return (
-    <section className="relative min-h-[85vh] flex items-center justify-center pt-16">
+    <section className="relative pt-28 md:pt-36 pb-16 md:pb-24 noise-overlay">
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <div className="max-w-3xl mx-auto text-center">
-          {/* Badge */}
+        {/* Top metadata strip */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease }}
+          className="grid grid-cols-12 gap-4 md:gap-8 mb-10 md:mb-14"
+        >
+          <div className="col-span-6 md:col-span-3">
+            <p className="editorial-label mb-2">№ 001 / Feature</p>
+            <p className="font-mono text-[11px] text-foreground/70">
+              {loading ? <Skeleton className="h-3 w-24" /> : settings.hero_badge}
+            </p>
+          </div>
+          <div className="hidden md:block col-span-3">
+            <p className="editorial-label mb-2">Filed</p>
+            <p className="font-mono text-[11px] text-foreground/70">
+              {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+            </p>
+          </div>
+          <div className="hidden md:block col-span-3">
+            <p className="editorial-label mb-2">Discipline</p>
+            <p className="font-mono text-[11px] text-foreground/70">Production · Mix · Master</p>
+          </div>
+          <div className="col-span-6 md:col-span-3 text-right">
+            <p className="editorial-label mb-2">Edition</p>
+            <p className="font-mono text-[11px] text-foreground/70">Vol. 01 — {new Date().getFullYear()}</p>
+          </div>
+        </motion.div>
+
+        {/* Mega headline */}
+        <div className="grid grid-cols-12 gap-4 md:gap-8 items-end mb-10 md:mb-14">
+          <div className="col-span-12 lg:col-span-9">
+            {loading ? (
+              <>
+                <Skeleton className="h-24 w-3/4 mb-3" />
+                <Skeleton className="h-24 w-2/3" />
+              </>
+            ) : (
+              <h1 className="display-mega text-foreground" style={{ fontSize: "clamp(3.25rem, 11vw, 11rem)" }}>
+                <span className="block overflow-hidden">
+                  <motion.span
+                    initial={{ y: "110%" }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 0.9, ease, delay: 0.05 }}
+                    className="block"
+                  >
+                    {firstPart}
+                    <span className="text-primary">.</span>
+                  </motion.span>
+                </span>
+                <span className="block overflow-hidden">
+                  <motion.span
+                    initial={{ y: "110%" }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 0.9, ease, delay: 0.18 }}
+                    className="block display-italic font-light text-foreground/90"
+                  >
+                    {secondPart}<span className="text-primary not-italic">.</span>
+                  </motion.span>
+                </span>
+              </h1>
+            )}
+          </div>
+
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/50 bg-card/50 mb-8"
+            transition={{ duration: 0.6, ease, delay: 0.45 }}
+            className="col-span-12 lg:col-span-3 flex flex-col gap-3"
           >
-            {loading ? (
-              <Skeleton className="h-4 w-28" />
-            ) : (
-              <span className="text-xs text-muted-foreground">{settings.hero_badge}</span>
-            )}
-          </motion.div>
-
-          {/* Heading */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6"
-          >
-            {loading ? (
-              <>
-                <Skeleton className="h-14 w-3/4 mx-auto mb-2" />
-                <Skeleton className="h-14 w-1/2 mx-auto" />
-              </>
-            ) : (
-              <>
-                <span className="text-foreground">{firstPart}.</span>
-                <br />
-                <span className="text-primary">{secondPart}.</span>
-              </>
-            )}
-          </motion.h1>
-
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed"
-          >
-            {loading ? <Skeleton className="h-5 w-full" /> : settings.hero_subtitle}
-          </motion.p>
-
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16"
-          >
-            <Link to="/beats" className="w-full sm:w-auto">
-              <Button variant="default" size="lg" className="w-full sm:w-auto group">
-                <Play className="w-4 h-4 mr-2" />
+            <p className="text-sm text-foreground/75 leading-relaxed max-w-xs">
+              {loading ? <Skeleton className="h-4 w-full" /> : settings.hero_subtitle}
+            </p>
+            <div className="flex flex-col gap-2 mt-2">
+              <Link
+                to="/beats"
+                className="group inline-flex items-center justify-between gap-6 px-5 py-4 border border-foreground bg-foreground text-background hover:bg-primary hover:border-primary hover:text-primary-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em]"
+              >
                 Explore Beats
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
-              </Button>
-            </Link>
-            <Link to="/booking" className="w-full sm:w-auto">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </Link>
+              <Link
+                to="/booking"
+                className="group inline-flex items-center justify-between gap-6 px-5 py-4 border border-border hover:border-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em] text-foreground"
+              >
                 Book a Session
-              </Button>
-            </Link>
-          </motion.div>
-
-          {/* Waveform */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="hidden sm:block"
-          >
-            <WaveformVisualizer />
-          </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 pt-10 border-t border-border/20"
-          >
-            {[
-              { value: settings.stat_projects, label: "Projects" },
-              { value: settings.stat_artists, label: "Artists" },
-              { value: settings.stat_nominations, label: "Nominations" },
-              { value: settings.stat_access, label: "Studio Access" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-1">
-                  {loading ? <Skeleton className="h-8 w-14 mx-auto" /> : stat.value}
-                </div>
-                <div className="text-xs text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
+                <ArrowUpRight className="w-4 h-4 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              </Link>
+            </div>
           </motion.div>
         </div>
+
+        <div className="editorial-rule mb-10" />
+
+        {/* Waveform + lead */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, ease, delay: 0.5 }}
+          className="grid grid-cols-12 gap-4 md:gap-8 items-end mb-12"
+        >
+          <div className="col-span-12 md:col-span-8">
+            <div className="relative h-32 md:h-40 overflow-hidden">
+              <WaveformVisualizer />
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+            </div>
+          </div>
+          <div className="col-span-12 md:col-span-4">
+            <p className="editorial-label mb-3">Live Session</p>
+            <p className="font-mono text-[11px] text-foreground/70">
+              Studio · Nairobi → Worldwide<br />
+              Channels: 32 · Latency: 4ms
+            </p>
+          </div>
+        </motion.div>
+
+        <div className="editorial-rule mb-10" />
+
+        {/* Stats — editorial table */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease, delay: 0.7 }}
+          className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border-y border-border"
+        >
+          {[
+            { idx: "01", value: settings.stat_projects, label: "Projects" },
+            { idx: "02", value: settings.stat_artists, label: "Artists" },
+            { idx: "03", value: settings.stat_nominations, label: "Nominations" },
+            { idx: "04", value: settings.stat_access, label: "Studio Access" },
+          ].map((stat) => (
+            <div key={stat.label} className="px-4 sm:px-6 py-6 sm:py-8">
+              <p className="editorial-index mb-3">{stat.idx}</p>
+              <p className="display-headline text-3xl sm:text-4xl md:text-5xl text-foreground mb-2">
+                {loading ? <Skeleton className="h-9 w-16" /> : stat.value}
+              </p>
+              <p className="editorial-label">{stat.label}</p>
+            </div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );
