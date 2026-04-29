@@ -26,7 +26,8 @@ import {
   Users,
   CreditCard,
   Activity,
-  RefreshCw
+  RefreshCw,
+  Share2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -69,7 +70,12 @@ export const AnalyticsPanel = () => {
     beatsChange: 0,
     totalUsers: 0,
     usersChange: 0,
+    totalReferrals: 0,
+    referralsChange: 0,
+    qualifiedReferrals: 0,
+    referralRewardsPaid: 0,
   });
+  const [referralTrend, setReferralTrend] = useState<ChartData[]>([]);
 
   useEffect(() => {
     fetchAnalytics();
@@ -132,6 +138,18 @@ export const AnalyticsPanel = () => {
         .gte("created_at", previousStart.toISOString())
         .lt("created_at", startDate.toISOString());
 
+      // Fetch referrals
+      const { data: referrals } = await supabase
+        .from("referrals")
+        .select("id, status, reward_amount, created_at")
+        .gte("created_at", startDate.toISOString());
+
+      const { data: previousReferrals } = await supabase
+        .from("referrals")
+        .select("id")
+        .gte("created_at", previousStart.toISOString())
+        .lt("created_at", startDate.toISOString());
+
       // Calculate stats
       const currentRevenue = payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
       const prevRevenue = previousPayments?.reduce((acc, p) => acc + p.amount, 0) || 0;
@@ -158,6 +176,17 @@ export const AnalyticsPanel = () => {
         beatsChange,
         totalUsers: currentUsers,
         usersChange,
+        totalReferrals: referrals?.length || 0,
+        referralsChange:
+          (previousReferrals?.length || 0) > 0
+            ? (((referrals?.length || 0) - (previousReferrals?.length || 0)) /
+                (previousReferrals?.length || 1)) *
+              100
+            : 0,
+        qualifiedReferrals:
+          referrals?.filter((r) => r.status === "qualified" || r.status === "rewarded").length || 0,
+        referralRewardsPaid:
+          referrals?.reduce((acc, r) => acc + Number(r.reward_amount || 0), 0) || 0,
       });
 
       // Generate daily revenue data
@@ -211,6 +240,17 @@ export const AnalyticsPanel = () => {
         };
       });
       setUserGrowth(userGrowthData);
+
+      // Referral trend data
+      const referralTrendData = dateInterval.map((date) => {
+        const dayRefs =
+          referrals?.filter((r) => isSameDay(new Date(r.created_at), date)) || [];
+        return {
+          name: format(date, "MMM d"),
+          value: dayRefs.length,
+        };
+      });
+      setReferralTrend(referralTrendData);
 
     } catch (error) {
       logger.error(error, "fetchAnalytics");
@@ -307,6 +347,42 @@ export const AnalyticsPanel = () => {
           change={stats.usersChange}
           icon={Users}
         />
+      </div>
+
+      {/* Referral stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <StatCard
+          title="New Referrals"
+          value={stats.totalReferrals}
+          change={stats.referralsChange}
+          icon={Share2}
+        />
+        <Card className="border-border/50">
+          <CardContent className="p-6">
+            <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
+              <Share2 className="w-6 h-6 text-accent" />
+            </div>
+            <div className="mt-4">
+              <p className="text-3xl font-display font-bold">
+                {stats.qualifiedReferrals.toLocaleString()}
+              </p>
+              <p className="text-sm text-muted-foreground">Qualified Referrals</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-border/50">
+          <CardContent className="p-6">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <DollarSign className="w-6 h-6 text-primary" />
+            </div>
+            <div className="mt-4">
+              <p className="text-3xl font-display font-bold">
+                KES {stats.referralRewardsPaid.toLocaleString()}
+              </p>
+              <p className="text-sm text-muted-foreground">Referral Rewards</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Grid */}
