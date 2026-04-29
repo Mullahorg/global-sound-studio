@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { NotificationCenter } from "@/components/ui/NotificationCenter";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -93,6 +94,7 @@ export const Navbar = () => {
             >
               <Command className="w-4 h-4" />
             </Button>
+            <ThemeToggle />
 
             {user ? (
               <>

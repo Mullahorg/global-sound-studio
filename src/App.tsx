@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AudioQueueProvider } from "@/contexts/AudioQueueContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import { QuickActions } from "@/components/ui/QuickActions";
 import { PWAInstallPrompt } from "@/components/ui/PWAInstallPrompt";
@@ -58,9 +59,10 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <AudioQueueProvider>
-            <TooltipProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <AudioQueueProvider>
+              <TooltipProvider>
               <ErrorBoundary>
                 <Toaster />
                 <Sonner />
@@ -102,9 +104,10 @@ const App = () => (
                   </Suspense>
                 </MaintenanceGate>
               </ErrorBoundary>
-            </TooltipProvider>
-          </AudioQueueProvider>
-        </AuthProvider>
+              </TooltipProvider>
+            </AudioQueueProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </HelmetProvider>
