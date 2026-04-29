@@ -577,6 +577,48 @@ export const AnalyticsPanel = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Referral Trend */}
+      <Card className="border-border/50 mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Share2 className="w-5 h-5 text-primary" />
+            Referral Activity
+          </CardTitle>
+          <CardDescription>New referrals over time</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-72">
+            {referralTrend.some((d) => d.value > 0) ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={referralTrend}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "8px",
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    dot={{ fill: "hsl(var(--primary))", strokeWidth: 2 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-muted-foreground">
+                No referral activity in this period
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };
