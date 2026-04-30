@@ -25,7 +25,7 @@ export const BookSessionCTA = () => {
             </h2>
 
             <p className="text-muted-foreground max-w-lg mx-auto mb-8">
-              Book a session with our producers and engineers. In-studio or remote — we'll bring your vision to life.
+              Book a session with our producers and engineers. In-studio or remote - we'll bring your vision to life.
             </p>
 
             <div className="flex flex-wrap justify-center gap-6 mb-10">
