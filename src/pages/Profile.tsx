@@ -618,4 +618,64 @@ const SecurityTab = () => {
   );
 };
 
+/** Preferences (theme + language) */
+const PreferencesTab = () => {
+  const { theme, setTheme } = useTheme();
+  const { language, setLanguage } = useLanguage();
+  const { t } = useTranslation();
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t("profile.preferences")}</CardTitle>
+        <CardDescription>{t("profile.savePreferences")}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-2">
+          <Label>{t("profile.themePreference")}</Label>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={theme === "light" ? "default" : "outline"}
+              onClick={() => setTheme("light")}
+              className="flex-1"
+            >
+              <Sun className="w-4 h-4 mr-2" /> {t("common.light")}
+            </Button>
+            <Button
+              type="button"
+              variant={theme === "dark" ? "default" : "outline"}
+              onClick={() => setTheme("dark")}
+              className="flex-1"
+            >
+              <Moon className="w-4 h-4 mr-2" /> {t("common.dark")}
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>{t("profile.languagePreference")}</Label>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={language === "en" ? "default" : "outline"}
+              onClick={() => setLanguage("en")}
+              className="flex-1"
+            >
+              <Languages className="w-4 h-4 mr-2" /> {t("common.english")}
+            </Button>
+            <Button
+              type="button"
+              variant={language === "sw" ? "default" : "outline"}
+              onClick={() => setLanguage("sw")}
+              className="flex-1"
+            >
+              <Languages className="w-4 h-4 mr-2" /> {t("common.swahili")}
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 export default Profile;
