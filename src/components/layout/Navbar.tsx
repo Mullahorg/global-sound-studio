@@ -10,13 +10,14 @@ import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { PageMetrics } from "@/components/ui/ScrollProgress";
+import { useTranslation } from "react-i18next";
 
-const navLinks = [
-  { idx: "01", label: "Index", href: "/" },
-  { idx: "02", label: "Studio", href: "/studio" },
-  { idx: "03", label: "Beats", href: "/beats" },
-  { idx: "04", label: "Book", href: "/booking" },
-  { idx: "05", label: "Contact", href: "/contact" },
+const navLinkDefs = [
+  { idx: "01", labelKey: "nav.home", href: "/" },
+  { idx: "02", labelKey: "nav.studio", href: "/studio" },
+  { idx: "03", labelKey: "nav.beats", href: "/beats" },
+  { idx: "04", labelKey: "nav.booking", href: "/booking" },
+  { idx: "05", labelKey: "nav.contact", href: "/contact" },
 ];
 
 export const Navbar = () => {
@@ -27,6 +28,8 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { settings } = usePlatformSettings();
+  const { t } = useTranslation();
+  const navLinks = navLinkDefs.map((l) => ({ ...l, label: t(l.labelKey) }));
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
