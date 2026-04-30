@@ -201,7 +201,8 @@ export const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-background lg:hidden z-40 noise-overlay"
+            className="fixed inset-0 lg:hidden z-40 noise-overlay bg-background/100 backdrop-blur-2xl"
+            style={{ backgroundColor: "hsl(var(--background))" }}
           >
             <div className="flex flex-col h-full pt-20 pb-8 px-6">
               <div className="flex items-center justify-between mb-8 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
