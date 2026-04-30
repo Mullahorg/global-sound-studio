@@ -538,6 +538,11 @@ const Profile = () => {
               <TabsContent value="security">
                 <SecurityTab />
               </TabsContent>
+
+              {/* Preferences Tab */}
+              <TabsContent value="preferences">
+                <PreferencesTab />
+              </TabsContent>
             </Tabs>
           </motion.div>
         </div>
