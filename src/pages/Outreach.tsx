@@ -245,7 +245,7 @@ export default function Outreach() {
 
         {/* Programs Section */}
         <section className="py-20">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -484,7 +484,7 @@ export default function Outreach() {
 
         {/* CTA Section */}
         <section className="py-20 bg-gradient-to-b from-background to-card">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}

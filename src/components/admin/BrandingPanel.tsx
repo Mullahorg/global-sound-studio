@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Upload, 
@@ -20,6 +21,29 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { LogoCropper } from "./LogoCropper";
 import { LogoFormatConverter } from "./LogoFormatConverter";
+import { Palette } from "lucide-react";
+
+function hexToHsl(hex: string): string {
+  let h = hex.replace("#", "");
+  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  const r = parseInt(h.slice(0, 2), 16) / 255;
+  const g = parseInt(h.slice(2, 4), 16) / 255;
+  const b = parseInt(h.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let hh = 0, s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: hh = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: hh = (b - r) / d + 2; break;
+      case b: hh = (r - g) / d + 4; break;
+    }
+    hh /= 6;
+  }
+  return `${Math.round(hh * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+}
 
 export const BrandingPanel = () => {
   const { toast } = useToast();
@@ -30,6 +54,50 @@ export const BrandingPanel = () => {
   const [showCropper, setShowCropper] = useState(false);
   const [activeTab, setActiveTab] = useState("upload");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [primaryColor, setPrimaryColor] = useState<string>("#ea580c");
+  const [savingColor, setSavingColor] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("platform_settings")
+        .select("setting_key, setting_value")
+        .in("setting_key", ["site_logo", "primary_color"]);
+      data?.forEach((row) => {
+        if (row.setting_key === "site_logo" && row.setting_value) setLogoUrl(row.setting_value);
+        if (row.setting_key === "primary_color" && row.setting_value) {
+          // Stored as hex; if HSL triplet, convert back to a visual hex picker default
+          if (row.setting_value.startsWith("#")) setPrimaryColor(row.setting_value);
+        }
+      });
+    })();
+  }, []);
+
+  const handleSaveColor = async () => {
+    setSavingColor(true);
+    try {
+      await supabase
+        .from("platform_settings")
+        .upsert(
+          {
+            setting_key: "primary_color",
+            setting_value: primaryColor,
+            setting_type: "string",
+            description: "Primary brand color (hex)",
+          },
+          { onConflict: "setting_key" }
+        );
+      // Apply immediately
+      document.documentElement.style.setProperty("--primary", hexToHsl(primaryColor));
+      document.documentElement.style.setProperty("--ring", hexToHsl(primaryColor));
+      toast({ title: "Color saved", description: "Primary brand color updated site-wide." });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Failed to save color";
+      toast({ title: "Error", description: msg, variant: "destructive" });
+    } finally {
+      setSavingColor(false);
+    }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -318,6 +386,51 @@ export const BrandingPanel = () => {
             <p className="text-sm text-foreground">
               <strong>Tip:</strong> Use the Export tab to download your logo in all required formats for favicons, PWA icons, and social sharing.
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Brand Color */}
+      <div className="p-6 rounded-xl bg-card border border-border/50">
+        <div className="flex items-center gap-2 mb-6">
+          <Palette className="w-5 h-5 text-primary" />
+          <h3 className="font-display text-lg font-semibold">Brand Color</h3>
+        </div>
+        <p className="text-sm text-muted-foreground mb-6">
+          The primary color is used site-wide for buttons, links, accents and the active nav state.
+        </p>
+
+        <div className="grid sm:grid-cols-[auto_1fr_auto] items-end gap-4">
+          <div className="space-y-2">
+            <Label>Pick</Label>
+            <input
+              type="color"
+              value={primaryColor}
+              onChange={(e) => setPrimaryColor(e.target.value)}
+              className="w-20 h-12 rounded-md border border-border bg-background cursor-pointer p-1"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Hex</Label>
+            <Input
+              value={primaryColor}
+              onChange={(e) => setPrimaryColor(e.target.value)}
+              placeholder="#ea580c"
+            />
+          </div>
+          <Button onClick={handleSaveColor} disabled={savingColor} className="h-11">
+            {savingColor ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
+            Save Color
+          </Button>
+        </div>
+
+        <div className="mt-6 flex items-center gap-3">
+          <span className="text-xs text-muted-foreground">Preview:</span>
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-md border border-border" style={{ backgroundColor: primaryColor }} />
+            <Button style={{ backgroundColor: primaryColor, color: "#fff" }} className="rounded-sm">
+              Sample Button
+            </Button>
           </div>
         </div>
       </div>

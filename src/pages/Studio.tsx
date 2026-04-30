@@ -130,7 +130,7 @@ const Studio = () => {
         {/* Hero */}
         <section className="relative py-20 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-radial from-primary/10 via-transparent to-transparent" />
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -341,7 +341,7 @@ const Studio = () => {
         </section>
 
         {/* CTA */}
-        <section className="container mx-auto px-6">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
