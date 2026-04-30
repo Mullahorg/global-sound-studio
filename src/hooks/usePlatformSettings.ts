@@ -7,6 +7,7 @@ const logger = createLogger("usePlatformSettings");
 export interface PlatformSettings {
   site_name: string;
   site_logo: string;
+  primary_color: string;
   hero_title: string;
   hero_subtitle: string;
   hero_badge: string;
@@ -24,6 +25,7 @@ export interface PlatformSettings {
 const defaultSettings: PlatformSettings = {
   site_name: "WE Global",
   site_logo: "/logo.png",
+  primary_color: "18 90% 48%",
   hero_title: "Global Sound. One Studio.",
   hero_subtitle: "A borderless ecosystem connecting artists, producers, labels, and brands through world-class music production. Your vision, our craft.",
   hero_badge: "World-Class Production Studio",
