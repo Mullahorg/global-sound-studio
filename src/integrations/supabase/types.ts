@@ -1172,10 +1172,12 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          language_preference: string | null
           phone: string | null
           region: string | null
           role: string | null
           social_links: Json | null
+          theme_preference: string | null
           updated_at: string
         }
         Insert: {
@@ -1188,10 +1190,12 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          language_preference?: string | null
           phone?: string | null
           region?: string | null
           role?: string | null
           social_links?: Json | null
+          theme_preference?: string | null
           updated_at?: string
         }
         Update: {
@@ -1204,10 +1208,12 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          language_preference?: string | null
           phone?: string | null
           region?: string | null
           role?: string | null
           social_links?: Json | null
+          theme_preference?: string | null
           updated_at?: string
         }
         Relationships: []

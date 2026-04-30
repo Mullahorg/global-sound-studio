@@ -1,0 +1,77 @@
+{
+  "common": {
+    "loading": "Inapakia...",
+    "save": "Hifadhi",
+    "cancel": "Ghairi",
+    "delete": "Futa",
+    "edit": "Hariri",
+    "back": "Rudi",
+    "next": "Endelea",
+    "submit": "Wasilisha",
+    "search": "Tafuta",
+    "viewAll": "Tazama zote",
+    "learnMore": "Jifunze zaidi",
+    "explore": "Chunguza",
+    "bookNow": "Weka nafasi",
+    "signIn": "Ingia",
+    "signUp": "Jisajili",
+    "signOut": "Toka",
+    "language": "Lugha",
+    "theme": "Mandhari",
+    "dark": "Giza",
+    "light": "Mwanga",
+    "english": "Kiingereza",
+    "swahili": "Kiswahili"
+  },
+  "nav": {
+    "home": "Nyumbani",
+    "beats": "Midundo",
+    "booking": "Kuhifadhi",
+    "services": "Huduma",
+    "outreach": "Ufikiaji",
+    "library": "Maktaba",
+    "dashboard": "Dashibodi",
+    "studio": "Studio",
+    "chat": "Soga",
+    "support": "Msaada",
+    "contact": "Wasiliana",
+    "profile": "Wasifu",
+    "wishlist": "Orodha ya matamanio",
+    "referrals": "Mapendekezo",
+    "admin": "Msimamizi"
+  },
+  "hero": {
+    "exploreBeats": "Chunguza Midundo",
+    "bookSession": "Weka Kipindi",
+    "discipline": "Utengenezaji · Mchanganyiko · Umaliziaji",
+    "filed": "Imewasilishwa",
+    "edition": "Toleo",
+    "feature": "Kipengele",
+    "liveSession": "Kipindi cha Moja kwa Moja"
+  },
+  "footer": {
+    "rights": "Haki zote zimehifadhiwa",
+    "privacy": "Faragha",
+    "terms": "Masharti",
+    "licensing": "Leseni",
+    "support": "Msaada",
+    "contact": "Wasiliana"
+  },
+  "auth": {
+    "email": "Barua pepe",
+    "password": "Nenosiri",
+    "fullName": "Jina kamili",
+    "forgotPassword": "Umesahau nenosiri?",
+    "createAccount": "Fungua akaunti",
+    "alreadyHaveAccount": "Tayari una akaunti?",
+    "noAccount": "Huna akaunti?"
+  },
+  "profile": {
+    "title": "Wasifu",
+    "preferences": "Mapendeleo",
+    "themePreference": "Pendeleo la mandhari",
+    "languagePreference": "Pendeleo la lugha",
+    "savePreferences": "Hifadhi mapendeleo",
+    "preferencesSaved": "Mapendeleo yamehifadhiwa"
+  }
+}

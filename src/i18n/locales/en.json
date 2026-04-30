@@ -1,0 +1,77 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "search": "Search",
+    "viewAll": "View all",
+    "learnMore": "Learn more",
+    "explore": "Explore",
+    "bookNow": "Book now",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "language": "Language",
+    "theme": "Theme",
+    "dark": "Dark",
+    "light": "Light",
+    "english": "English",
+    "swahili": "Swahili"
+  },
+  "nav": {
+    "home": "Home",
+    "beats": "Beats",
+    "booking": "Booking",
+    "services": "Services",
+    "outreach": "Outreach",
+    "library": "Library",
+    "dashboard": "Dashboard",
+    "studio": "Studio",
+    "chat": "Chat",
+    "support": "Support",
+    "contact": "Contact",
+    "profile": "Profile",
+    "wishlist": "Wishlist",
+    "referrals": "Referrals",
+    "admin": "Admin"
+  },
+  "hero": {
+    "exploreBeats": "Explore Beats",
+    "bookSession": "Book a Session",
+    "discipline": "Production · Mix · Master",
+    "filed": "Filed",
+    "edition": "Edition",
+    "feature": "Feature",
+    "liveSession": "Live Session"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "licensing": "Licensing",
+    "support": "Support",
+    "contact": "Contact"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full name",
+    "forgotPassword": "Forgot password?",
+    "createAccount": "Create account",
+    "alreadyHaveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?"
+  },
+  "profile": {
+    "title": "Profile",
+    "preferences": "Preferences",
+    "themePreference": "Theme preference",
+    "languagePreference": "Language preference",
+    "savePreferences": "Save preferences",
+    "preferencesSaved": "Preferences saved"
+  }
+}
