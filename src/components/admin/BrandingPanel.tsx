@@ -389,6 +389,51 @@ export const BrandingPanel = () => {
           </div>
         </div>
       </div>
+
+      {/* Brand Color */}
+      <div className="p-6 rounded-xl bg-card border border-border/50">
+        <div className="flex items-center gap-2 mb-6">
+          <Palette className="w-5 h-5 text-primary" />
+          <h3 className="font-display text-lg font-semibold">Brand Color</h3>
+        </div>
+        <p className="text-sm text-muted-foreground mb-6">
+          The primary color is used site-wide for buttons, links, accents and the active nav state.
+        </p>
+
+        <div className="grid sm:grid-cols-[auto_1fr_auto] items-end gap-4">
+          <div className="space-y-2">
+            <Label>Pick</Label>
+            <input
+              type="color"
+              value={primaryColor}
+              onChange={(e) => setPrimaryColor(e.target.value)}
+              className="w-20 h-12 rounded-md border border-border bg-background cursor-pointer p-1"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Hex</Label>
+            <Input
+              value={primaryColor}
+              onChange={(e) => setPrimaryColor(e.target.value)}
+              placeholder="#ea580c"
+            />
+          </div>
+          <Button onClick={handleSaveColor} disabled={savingColor} className="h-11">
+            {savingColor ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
+            Save Color
+          </Button>
+        </div>
+
+        <div className="mt-6 flex items-center gap-3">
+          <span className="text-xs text-muted-foreground">Preview:</span>
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-md border border-border" style={{ backgroundColor: primaryColor }} />
+            <Button style={{ backgroundColor: primaryColor, color: "#fff" }} className="rounded-sm">
+              Sample Button
+            </Button>
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 };
