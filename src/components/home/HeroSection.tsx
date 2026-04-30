@@ -5,7 +5,7 @@ import { WaveformVisualizer } from "@/components/ui/WaveformVisualizer";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const ease = [0.25, 0.1, 0.25, 1];
+const ease: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 export const HeroSection = () => {
   const { settings, loading } = usePlatformSettings();
