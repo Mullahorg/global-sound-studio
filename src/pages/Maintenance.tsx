@@ -25,7 +25,7 @@ const Maintenance = () => {
 
         <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
           We're making some improvements to give you a better experience.
-          We'll be back shortly — thanks for your patience!
+          We'll be back shortly - thanks for your patience!
         </p>
 
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-8">

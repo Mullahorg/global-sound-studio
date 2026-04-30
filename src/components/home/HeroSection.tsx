@@ -42,7 +42,7 @@ export const HeroSection = () => {
           </div>
           <div className="col-span-6 md:col-span-3 text-right">
             <p className="editorial-label mb-2">Edition</p>
-            <p className="font-mono text-[11px] text-foreground/70">Vol. 01 — {new Date().getFullYear()}</p>
+            <p className="font-mono text-[11px] text-foreground/70">Vol. 01 - {new Date().getFullYear()}</p>
           </div>
         </motion.div>
 
@@ -135,7 +135,7 @@ export const HeroSection = () => {
 
         <div className="editorial-rule mb-10" />
 
-        {/* Stats — editorial table */}
+        {/* Stats - editorial table */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

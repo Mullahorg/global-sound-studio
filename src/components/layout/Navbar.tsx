@@ -54,7 +54,7 @@ export const Navbar = () => {
           : "bg-transparent border-b border-transparent"
       }`}
     >
-      {/* Top utility strip — disappears on scroll */}
+      {/* Top utility strip - disappears on scroll */}
       <div
         className={`hidden md:block border-b border-border/40 overflow-hidden transition-all duration-500 ${
           isScrolled ? "h-0 opacity-0" : "h-7 opacity-100"

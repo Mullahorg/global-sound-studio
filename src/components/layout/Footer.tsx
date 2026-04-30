@@ -55,7 +55,7 @@ export const Footer = forwardRef<HTMLElement>((_, ref) => {
               who refuse the average.
             </h2>
             <p className="mt-8 max-w-md text-sm text-muted-foreground leading-relaxed">
-              A borderless production house. Studio sessions, mixing, mastering, and licensable beats — engineered with care.
+              A borderless production house. Studio sessions, mixing, mastering, and licensable beats - engineered with care.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:items-center">

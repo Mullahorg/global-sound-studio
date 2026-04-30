@@ -453,7 +453,7 @@ export const SettingsPanel = () => {
                       <CardTitle className="flex items-center gap-2 text-lg">
                         Maintenance Mode
                         <Badge className={settings.maintenance_mode === "true" ? "bg-amber-500/10 text-amber-500" : "bg-green-500/10 text-green-500"}>
-                          {settings.maintenance_mode === "true" ? "ON — Site Down" : "OFF — Live"}
+                          {settings.maintenance_mode === "true" ? "ON - Site Down" : "OFF - Live"}
                         </Badge>
                       </CardTitle>
                       <CardDescription>
