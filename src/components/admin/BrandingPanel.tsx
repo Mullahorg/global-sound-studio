@@ -23,6 +23,28 @@ import { LogoCropper } from "./LogoCropper";
 import { LogoFormatConverter } from "./LogoFormatConverter";
 import { Palette } from "lucide-react";
 
+function hexToHsl(hex: string): string {
+  let h = hex.replace("#", "");
+  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  const r = parseInt(h.slice(0, 2), 16) / 255;
+  const g = parseInt(h.slice(2, 4), 16) / 255;
+  const b = parseInt(h.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let hh = 0, s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: hh = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: hh = (b - r) / d + 2; break;
+      case b: hh = (r - g) / d + 4; break;
+    }
+    hh /= 6;
+  }
+  return `${Math.round(hh * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+}
+
 export const BrandingPanel = () => {
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
