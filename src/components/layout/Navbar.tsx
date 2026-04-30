@@ -224,7 +224,7 @@ export const Navbar = () => {
                       }`}
                     >
                       <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{link.idx}</span>
-                      <span className="display-headline text-3xl">{link.label}</span>
+                      <span className="display-headline text-2xl sm:text-3xl">{link.label}</span>
                       <ArrowUpRight className="w-4 h-4 ml-auto text-muted-foreground" />
                     </Link>
                   </motion.div>
