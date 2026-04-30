@@ -73,11 +73,19 @@ export const Navbar = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Wordmark */}
           <Link to="/" className="flex items-end gap-3 z-50 group">
+            {settings.site_logo && (
+              <img
+                src={settings.site_logo}
+                alt={settings.site_name || "Logo"}
+                className="w-8 h-8 sm:w-9 sm:h-9 object-contain"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/logo.png"; }}
+              />
+            )}
             <div className="relative">
-              <span className="block font-display font-semibold text-foreground text-base sm:text-lg tracking-[-0.04em] leading-none">
+              <span className="block font-display font-semibold text-foreground text-sm sm:text-base md:text-lg tracking-[-0.04em] leading-none">
                 {settings.site_name?.split(" ")[0] || "WE"}
               </span>
-              <span className="block font-mono text-[9px] uppercase tracking-[0.28em] text-muted-foreground mt-1">
+              <span className="hidden sm:block font-mono text-[9px] uppercase tracking-[0.28em] text-muted-foreground mt-1">
                 {settings.site_name?.split(" ").slice(1).join(" ") || "Global Studio"}
               </span>
             </div>
