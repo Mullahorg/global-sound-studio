@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Upload, 
@@ -20,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { LogoCropper } from "./LogoCropper";
 import { LogoFormatConverter } from "./LogoFormatConverter";
+import { Palette } from "lucide-react";
 
 export const BrandingPanel = () => {
   const { toast } = useToast();
@@ -30,6 +32,50 @@ export const BrandingPanel = () => {
   const [showCropper, setShowCropper] = useState(false);
   const [activeTab, setActiveTab] = useState("upload");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [primaryColor, setPrimaryColor] = useState<string>("#ea580c");
+  const [savingColor, setSavingColor] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("platform_settings")
+        .select("setting_key, setting_value")
+        .in("setting_key", ["site_logo", "primary_color"]);
+      data?.forEach((row) => {
+        if (row.setting_key === "site_logo" && row.setting_value) setLogoUrl(row.setting_value);
+        if (row.setting_key === "primary_color" && row.setting_value) {
+          // Stored as hex; if HSL triplet, convert back to a visual hex picker default
+          if (row.setting_value.startsWith("#")) setPrimaryColor(row.setting_value);
+        }
+      });
+    })();
+  }, []);
+
+  const handleSaveColor = async () => {
+    setSavingColor(true);
+    try {
+      await supabase
+        .from("platform_settings")
+        .upsert(
+          {
+            setting_key: "primary_color",
+            setting_value: primaryColor,
+            setting_type: "string",
+            description: "Primary brand color (hex)",
+          },
+          { onConflict: "setting_key" }
+        );
+      // Apply immediately
+      document.documentElement.style.setProperty("--primary", hexToHsl(primaryColor));
+      document.documentElement.style.setProperty("--ring", hexToHsl(primaryColor));
+      toast({ title: "Color saved", description: "Primary brand color updated site-wide." });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Failed to save color";
+      toast({ title: "Error", description: msg, variant: "destructive" });
+    } finally {
+      setSavingColor(false);
+    }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
