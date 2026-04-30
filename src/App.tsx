@@ -8,6 +8,8 @@ import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AudioQueueProvider } from "@/contexts/AudioQueueContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import "@/i18n";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import { QuickActions } from "@/components/ui/QuickActions";
 import { PWAInstallPrompt } from "@/components/ui/PWAInstallPrompt";
@@ -60,8 +62,9 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <ThemeProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <LanguageProvider>
             <AudioQueueProvider>
               <TooltipProvider>
               <ErrorBoundary>
@@ -108,8 +111,9 @@ const App = () => (
               </ErrorBoundary>
               </TooltipProvider>
             </AudioQueueProvider>
-          </AuthProvider>
-        </ThemeProvider>
+            </LanguageProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </HelmetProvider>
