@@ -144,7 +144,7 @@ const Wishlist = () => {
       <Navbar />
 
       <main className="pt-24 pb-32">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
