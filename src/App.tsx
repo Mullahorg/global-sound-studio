@@ -21,6 +21,7 @@ import { PageLoader } from "@/components/ui/PageLoader";
 import { Analytics } from "@vercel/analytics/react";
 import { QuickAdminAccess } from "@/components/ui/QuickAdminAccess";
 import { MaintenanceGate } from "@/components/MaintenanceGate";
+import { BrandApplier } from "@/components/BrandApplier";
 
 // Eager loaded pages (critical path)
 import Index from "./pages/Index";
@@ -70,6 +71,7 @@ const App = () => (
               <ErrorBoundary>
                 <Toaster />
                 <Sonner />
+                <BrandApplier />
                 <ScrollProgress />
                 <CommandPalette />
                 <QuickActions />
