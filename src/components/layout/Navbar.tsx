@@ -8,6 +8,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { NotificationCenter } from "@/components/ui/NotificationCenter";
 import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { PageMetrics } from "@/components/ui/ScrollProgress";
 
 const navLinks = [
@@ -120,6 +121,7 @@ export const Navbar = () => {
               <Command className="w-4 h-4" />
             </Button>
             <ThemeToggle className="w-9 h-9 text-muted-foreground hover:text-foreground rounded-sm" />
+            <LanguageToggle className="w-9 h-9 text-muted-foreground hover:text-foreground rounded-sm" />
 
             {user ? (
               <>
@@ -228,6 +230,7 @@ export const Navbar = () => {
                         <Heart className="w-4 h-4" />
                       </Button>
                       <ThemeToggle className="flex-1 h-11 rounded-sm border border-border" />
+                      <LanguageToggle className="flex-1 h-11 rounded-sm border border-border" />
                     </div>
                     {isAdmin && (
                       <Button variant="outline" className="w-full h-11 justify-center rounded-sm font-mono text-[10px] uppercase tracking-[0.2em]" onClick={() => navigate("/admin")}>
