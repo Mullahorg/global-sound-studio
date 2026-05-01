@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { format, addDays, isSameDay, isAfter, startOfToday } from "date-fns";
-import { Calendar, Clock, User, ArrowRight, Check, ChevronLeft, ChevronRight, Smartphone, RefreshCw } from "lucide-react";
+import { Calendar, Clock, User, ArrowRight, Check, ChevronLeft, ChevronRight, Smartphone, RefreshCw, Music2 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -87,7 +87,7 @@ const Booking = () => {
           description: p.description,
           price_kes: Number(p.price_kes),
           duration_hours: p.duration_hours,
-          icon: p.icon || "🎵",
+          icon: p.icon || "",
           is_active: p.is_active,
         })));
       }
@@ -398,8 +398,14 @@ const Booking = () => {
                           : "border-border hover:border-primary/50"
                       }`}
                     >
-                      <div className="flex items-start gap-4">
-                        <span className="text-3xl">{session.icon}</span>
+                       <div className="flex items-start gap-4">
+                         <div className="w-12 h-12 rounded-sm bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                           {session.icon ? (
+                             <span className="text-2xl leading-none">{session.icon}</span>
+                           ) : (
+                             <Music2 className="w-5 h-5 text-primary" />
+                           )}
+                         </div>
                         <div className="flex-1">
                           <h3 className="font-display font-semibold text-lg mb-1">{session.name}</h3>
                           <p className="text-sm text-muted-foreground mb-3">{session.description}</p>
