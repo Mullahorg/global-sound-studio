@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Filter, Search, Music2, Upload, Plus, Loader2 } from "lucide-react";
+import { Filter, Search, Music2, Upload, Plus, Loader2, Flame, SlidersHorizontal } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -115,16 +115,18 @@ const Beats = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="mb-10 sm:mb-14"
           >
-            <span className="text-sm font-medium text-accent uppercase tracking-wider">
-              Kenya & Africa First
-            </span>
-            <h1 className="font-display text-4xl md:text-5xl font-bold mb-4 mt-2">
-              Beat <span className="gradient-text">Marketplace</span>
+            <div className="flex items-center gap-3 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.28em] text-muted-foreground mb-4">
+              <span className="w-8 h-px bg-primary" />
+              <span>Vol. 02 / Marketplace</span>
+              <span className="hidden sm:inline">— Kenya & Africa First</span>
+            </div>
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-[-0.04em] leading-[0.95]">
+              Beat <span className="italic font-light text-primary">Marketplace</span>
             </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Browse exclusive beats from top African producers. Find the perfect sound for your next hit.
+            <p className="mt-4 sm:mt-6 text-muted-foreground text-base sm:text-lg max-w-2xl">
+              Browse exclusive beats from top African producers. Find the perfect sound for your next release.
             </p>
           </motion.div>
 
@@ -133,13 +135,22 @@ const Beats = () => {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8 p-4 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-between"
+              className="mb-8 p-4 sm:p-5 rounded-sm bg-secondary border border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
             >
-              <div>
-                <h3 className="font-display font-semibold text-lg">Got new heat? 🔥</h3>
-                <p className="text-sm text-muted-foreground">Upload your beats and start selling to artists worldwide.</p>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-sm bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                  <Flame className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-display font-semibold text-base sm:text-lg tracking-tight">Got new heat?</h3>
+                  <p className="text-sm text-muted-foreground">Upload your beats and start selling to artists worldwide.</p>
+                </div>
               </div>
-              <Button variant="hero" onClick={() => setShowUploadDialog(true)}>
+              <Button
+                variant="default"
+                onClick={() => setShowUploadDialog(true)}
+                className="rounded-sm font-mono text-[10px] uppercase tracking-[0.22em] h-11 px-5 w-full sm:w-auto shrink-0"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Upload Beat
               </Button>
@@ -147,20 +158,20 @@ const Beats = () => {
           )}
 
           {/* Search & Filters */}
-          <div className="flex flex-col lg:flex-row gap-4 mb-8">
+          <div className="flex flex-col lg:flex-row gap-3 mb-8">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search beats or producers..."
-                className="pl-12 h-12 bg-secondary border-border"
+                className="pl-12 h-12 bg-secondary border-border rounded-sm"
               />
             </div>
-            
-            <div className="flex gap-3">
+
+            <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3">
               <Select value={selectedGenre} onValueChange={(v) => setSelectedGenre(v as BeatGenre | "all")}>
-                <SelectTrigger className="w-[160px] h-12 bg-secondary border-border">
+                <SelectTrigger className="sm:w-[160px] h-12 bg-secondary border-border rounded-sm">
                   <Music2 className="w-4 h-4 mr-2" />
                   <SelectValue placeholder="Genre" />
                 </SelectTrigger>
@@ -174,7 +185,8 @@ const Beats = () => {
               </Select>
 
               <Select value={selectedMood} onValueChange={(v) => setSelectedMood(v as BeatMood | "all")}>
-                <SelectTrigger className="w-[140px] h-12 bg-secondary border-border">
+                <SelectTrigger className="sm:w-[140px] h-12 bg-secondary border-border rounded-sm">
+                  <SlidersHorizontal className="w-4 h-4 mr-2" />
                   <SelectValue placeholder="Mood" />
                 </SelectTrigger>
                 <SelectContent>
@@ -189,11 +201,11 @@ const Beats = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="h-12"
+                className="h-12 col-span-2 rounded-sm"
                 onClick={() => setShowFilters(!showFilters)}
               >
                 <Filter className="w-4 h-4 mr-2" />
-                BPM
+                BPM Range
               </Button>
             </div>
           </div>
@@ -203,11 +215,11 @@ const Beats = () => {
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
-              className="mb-8 p-6 rounded-xl bg-card border border-border/50"
+              className="mb-8 p-5 sm:p-6 rounded-sm bg-card border border-border"
             >
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-medium">BPM Range:</span>
-                <span className="text-sm text-muted-foreground">{bpmRange[0]}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground sm:w-24">BPM Range</span>
+                <span className="font-mono text-sm text-foreground tabular-nums w-10">{bpmRange[0]}</span>
                 <Slider
                   value={bpmRange}
                   onValueChange={(v) => setBpmRange(v as [number, number])}
@@ -216,15 +228,16 @@ const Beats = () => {
                   step={5}
                   className="flex-1 max-w-md"
                 />
-                <span className="text-sm text-muted-foreground">{bpmRange[1]}</span>
+                <span className="font-mono text-sm text-foreground tabular-nums w-10 text-right">{bpmRange[1]}</span>
               </div>
             </motion.div>
           )}
 
           {/* Results Count */}
-          <p className="text-muted-foreground mb-6">
-            {loading ? "Loading..." : `Showing ${beats.length} beats`}
-          </p>
+          <div className="flex items-center justify-between mb-6 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            <span>{loading ? "Loading…" : `${beats.length} ${beats.length === 1 ? "result" : "results"}`}</span>
+            <span className="hidden sm:inline">Index 001 — {new Date().getFullYear()}</span>
+          </div>
 
           {/* Loading State */}
           {loading && (
@@ -235,7 +248,7 @@ const Beats = () => {
 
           {/* Beats Grid */}
           {!loading && (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
               {beats.map((beat) => (
                 <BeatCard
                   key={beat.id}
@@ -249,16 +262,16 @@ const Beats = () => {
 
           {/* Empty State */}
           {!loading && beats.length === 0 && (
-            <div className="text-center py-16">
-              <Music2 className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="font-display text-xl font-semibold mb-2">No beats found</h3>
-              <p className="text-muted-foreground mb-6">
+            <div className="text-center py-16 sm:py-24 border border-dashed border-border rounded-sm">
+              <Music2 className="w-12 h-12 sm:w-16 sm:h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="font-display text-xl sm:text-2xl font-semibold mb-2 tracking-tight">No beats found</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto px-4">
                 {searchQuery || selectedGenre !== "all" || selectedMood !== "all"
                   ? "Try adjusting your filters or search query."
                   : "Be the first to upload a beat!"}
               </p>
               {isProducer && (
-                <Button variant="hero" onClick={() => setShowUploadDialog(true)}>
+                <Button variant="default" onClick={() => setShowUploadDialog(true)} className="rounded-sm font-mono text-[10px] uppercase tracking-[0.22em] h-11 px-5">
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Your First Beat
                 </Button>
