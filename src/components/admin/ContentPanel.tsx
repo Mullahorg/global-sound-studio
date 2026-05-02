@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { DataIcon } from "@/lib/iconMap";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -309,8 +310,10 @@ export const ContentPanel = () => {
                     session.is_active ? "bg-secondary/50" : "bg-secondary/20 opacity-60"
                   }`}
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl">{session.icon}</span>
+                   <div className="flex items-center gap-4">
+                     <div className="w-10 h-10 rounded-sm bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                       <DataIcon value={session.icon} className="w-4 h-4 text-primary" />
+                     </div>
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{session.name}</p>
