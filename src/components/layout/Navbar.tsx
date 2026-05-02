@@ -60,17 +60,17 @@ export const Navbar = () => {
           isScrolled ? "h-0 opacity-0" : "h-7 opacity-100"
         }`}
       >
-        <div className="container mx-auto px-6 h-7 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 h-7 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
           <span>Vol. 01 / Issue {new Date().getFullYear()}</span>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 lg:gap-6">
             <span>Nairobi · Worldwide</span>
             <PageMetrics />
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16 md:h-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
           {/* Wordmark */}
           <Link to="/" className="flex items-end gap-3 z-50 group">
             {settings.site_logo && (
@@ -85,7 +85,7 @@ export const Navbar = () => {
               <span className="block font-display font-semibold text-foreground text-sm sm:text-base md:text-lg tracking-[-0.04em] leading-none">
                 {settings.site_name?.split(" ")[0] || "WE"}
               </span>
-              <span className="hidden sm:block font-mono text-[9px] uppercase tracking-[0.28em] text-muted-foreground mt-1">
+              <span className="hidden md:block font-mono text-[9px] uppercase tracking-[0.28em] text-muted-foreground mt-1">
                 {settings.site_name?.split(" ").slice(1).join(" ") || "Global Studio"}
               </span>
             </div>
@@ -93,21 +93,21 @@ export const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1">
             {navLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (
                 <Link
                   key={link.label}
                   to={link.href}
-                  className={`group/link relative px-4 py-2 flex items-baseline gap-2 transition-colors ${
+                  className={`group/link relative px-3 xl:px-4 py-2 flex items-baseline gap-2 transition-colors ${
                     isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <span className="font-mono text-[9px] uppercase tracking-[0.2em] opacity-50 group-hover/link:opacity-100 transition-opacity">
                     {link.idx}
                   </span>
-                  <span className="text-sm font-medium tracking-tight">{link.label}</span>
+                  <span className="text-[13px] xl:text-sm font-medium tracking-tight">{link.label}</span>
                   {isActive && (
                     <motion.span
                       layoutId="nav-active"
@@ -121,12 +121,12 @@ export const Navbar = () => {
           </div>
 
           {/* Actions */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => window.dispatchEvent(new CustomEvent("openCommandPalette"))}
-              className="w-9 h-9 text-muted-foreground hover:text-foreground rounded-sm"
+              className="w-9 h-9 text-muted-foreground hover:text-foreground rounded-sm hidden xl:inline-flex"
               aria-label="Search"
             >
               <Command className="w-4 h-4" />
@@ -140,14 +140,14 @@ export const Navbar = () => {
                 <Button variant="ghost" size="icon" className="w-9 h-9 rounded-sm" onClick={() => navigate("/chat")} aria-label="Messages">
                   <MessageSquare className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="icon" className="w-9 h-9 rounded-sm" onClick={() => navigate("/wishlist")} aria-label="Wishlist">
+                <Button variant="ghost" size="icon" className="w-9 h-9 rounded-sm hidden xl:inline-flex" onClick={() => navigate("/wishlist")} aria-label="Wishlist">
                   <Heart className="w-4 h-4" />
                 </Button>
                 {isAdmin && (
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-9 px-3 text-muted-foreground hover:text-foreground rounded-sm font-mono text-[10px] uppercase tracking-[0.2em]"
+                    className="h-9 px-2 xl:px-3 text-muted-foreground hover:text-foreground rounded-sm font-mono text-[10px] uppercase tracking-[0.2em]"
                     onClick={() => navigate("/admin")}
                   >
                     <Settings className="w-3.5 h-3.5 mr-1.5" />
@@ -157,7 +157,7 @@ export const Navbar = () => {
                 <Button
                   variant="default"
                   size="sm"
-                  className="h-9 px-4 ml-2 rounded-sm font-mono text-[10px] uppercase tracking-[0.2em]"
+                  className="h-9 px-3 xl:px-4 ml-1 xl:ml-2 rounded-sm font-mono text-[10px] uppercase tracking-[0.2em]"
                   onClick={() => navigate("/dashboard")}
                 >
                   <User className="w-3.5 h-3.5 mr-1.5" />
@@ -166,16 +166,17 @@ export const Navbar = () => {
               </>
             ) : (
               <>
-                <Button variant="ghost" size="sm" className="h-9 ml-2 font-mono text-[10px] uppercase tracking-[0.2em]" onClick={() => navigate("/auth")}>
+                <Button variant="ghost" size="sm" className="h-9 px-2 xl:px-3 ml-1 xl:ml-2 font-mono text-[10px] uppercase tracking-[0.2em]" onClick={() => navigate("/auth")}>
                   Sign In
                 </Button>
                 <Button
                   variant="default"
                   size="sm"
-                  className="h-9 px-4 rounded-sm font-mono text-[10px] uppercase tracking-[0.2em] group/cta"
+                  className="h-9 px-3 xl:px-4 rounded-sm font-mono text-[10px] uppercase tracking-[0.2em] group/cta"
                   onClick={() => navigate("/booking")}
                 >
-                  Book Session
+                  <span className="hidden xl:inline">Book Session</span>
+                  <span className="xl:hidden">Book</span>
                   <ArrowUpRight className="w-3.5 h-3.5 group-hover/cta:translate-x-0.5 group-hover/cta:-translate-y-0.5 transition-transform" />
                 </Button>
               </>
@@ -183,13 +184,18 @@ export const Navbar = () => {
           </div>
 
           {/* Mobile Toggle */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 text-foreground z-50 -mr-2"
-            aria-label={isOpen ? "Close menu" : "Open menu"}
-          >
-            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center gap-1 lg:hidden">
+            <ThemeToggle className="w-9 h-9 text-muted-foreground hover:text-foreground rounded-sm" />
+            <LanguageToggle className="w-9 h-9 text-muted-foreground hover:text-foreground rounded-sm" />
+            {user && <NotificationCenter />}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 text-foreground z-50 -mr-2 border border-border rounded-sm ml-1"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+            >
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </div>
 
