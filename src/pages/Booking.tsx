@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MpesaCheckoutDialog } from "@/components/payments/MpesaCheckoutDialog";
 import { logDatabaseError, logPaymentError, createLogger } from "@/lib/errorLogger";
+import { DataIcon } from "@/lib/iconMap";
 
 const logger = createLogger("Booking");
 
