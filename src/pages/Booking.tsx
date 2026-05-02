@@ -400,11 +400,7 @@ const Booking = () => {
                     >
                        <div className="flex items-start gap-4">
                          <div className="w-12 h-12 rounded-sm bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
-                           {session.icon ? (
-                             <span className="text-2xl leading-none">{session.icon}</span>
-                           ) : (
-                             <Music2 className="w-5 h-5 text-primary" />
-                           )}
+                           <DataIcon value={session.icon} className="w-5 h-5 text-primary" />
                          </div>
                         <div className="flex-1">
                           <h3 className="font-display font-semibold text-lg mb-1">{session.name}</h3>
