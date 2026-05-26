@@ -1,58 +1,89 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Music, Headphones, Radio, Video, Mic2, Sliders, ArrowRight } from "lucide-react";
+import { Music, Headphones, Radio, Video, Mic2, Sliders, ArrowUpRight } from "lucide-react";
 
 const services = [
-  { icon: Music, title: "Music Production", description: "Full-scale production from concept to master." },
-  { icon: Sliders, title: "Mixing & Mastering", description: "Radio-ready and streaming-optimized sound." },
-  { icon: Radio, title: "Beat Licensing", description: "Browse and license beats with flexible terms." },
-  { icon: Headphones, title: "Remote Sessions", description: "Collaborate with producers from anywhere." },
-  { icon: Mic2, title: "Songwriting", description: "Expert songwriters to craft your next hit." },
-  { icon: Video, title: "Sound for Film", description: "Scores and audio post-production for media." },
+  { idx: "01", icon: Music, title: "Music Production", swahili: "Utengenezaji", description: "Full-scale production from concept to master, built around your sound." },
+  { idx: "02", icon: Sliders, title: "Mixing & Mastering", swahili: "Mchanganyo", description: "Radio-ready, streaming-optimized masters tuned for African and global ears." },
+  { idx: "03", icon: Radio, title: "Beat Licensing", swahili: "Leseni za Beats", description: "License exclusive and non-exclusive beats with transparent, flexible terms." },
+  { idx: "04", icon: Headphones, title: "Remote Sessions", swahili: "Vipindi vya Mbali", description: "Collaborate with Nairobi-based producers from anywhere in the world." },
+  { idx: "05", icon: Mic2, title: "Songwriting", swahili: "Uandishi wa Nyimbo", description: "Top-line writers and composers crafting your next breakout record." },
+  { idx: "06", icon: Video, title: "Sound for Film", swahili: "Sauti ya Filamu", description: "Original scores and post-production audio for film, TV and brand work." },
 ];
 
 export const ServicesSection = () => {
   return (
-    <section id="services" className="py-20 md:py-28">
+    <section id="services" className="py-20 md:py-32 noise-overlay">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-14"
-        >
-          <p className="text-xs font-medium text-primary uppercase tracking-wider mb-3">What We Offer</p>
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-            Production <span className="text-primary">Services</span>
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            End-to-end music production services for artists, labels, and brands.
-          </p>
-        </motion.div>
+        {/* Editorial header */}
+        <div className="grid grid-cols-12 gap-4 md:gap-8 mb-12 md:mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="col-span-12 md:col-span-4"
+          >
+            <p className="editorial-eyebrow mb-6">№ 002 · Huduma</p>
+            <h2 className="display-headline text-foreground" style={{ fontSize: "clamp(2.25rem, 6vw, 4.5rem)" }}>
+              Production
+              <span className="block display-italic font-light text-foreground/90">services<span className="text-primary not-italic">.</span></span>
+            </h2>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="col-span-12 md:col-span-7 md:col-start-6 flex md:items-end"
+          >
+            <p className="text-base md:text-lg text-foreground/75 leading-relaxed max-w-xl">
+              End-to-end music production for artists, labels and brands. Crafted in Nairobi, engineered for the world.
+            </p>
+          </motion.div>
+        </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Services grid - editorial brutalist */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t border-l border-border">
           {services.map((service, index) => (
-            <Link key={service.title} to="/services">
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
-                className="group p-6 rounded-lg border border-border/30 hover:border-border transition-all"
+            <motion.div
+              key={service.title}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.06, duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+              className="border-r border-b border-border"
+            >
+              <Link
+                to="/services"
+                className="group relative block p-6 md:p-8 h-full transition-colors hover:bg-secondary/40 focus-visible:bg-secondary/40 outline-none"
               >
-                <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center mb-4">
-                  <service.icon className="w-5 h-5 text-primary" />
+                {/* index + arrow row */}
+                <div className="flex items-start justify-between mb-8 md:mb-10">
+                  <span className="editorial-index">{service.idx}</span>
+                  <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                 </div>
-                <h3 className="font-display text-base font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+
+                {/* icon */}
+                <div className="w-10 h-10 mb-6 flex items-center justify-center border border-border group-hover:border-primary group-hover:text-primary transition-colors">
+                  <service.icon className="w-4 h-4" strokeWidth={1.5} />
+                </div>
+
+                {/* title */}
+                <h3 className="display-headline text-2xl md:text-[28px] text-foreground mb-1.5 group-hover:text-primary transition-colors">
                   {service.title}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{service.description}</p>
-                <div className="mt-4 flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>Learn more</span>
-                  <ArrowRight className="w-3 h-3" />
-                </div>
-              </motion.div>
-            </Link>
+                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/80 mb-4">
+                  {service.swahili}
+                </p>
+
+                <p className="text-sm text-foreground/70 leading-relaxed max-w-xs">
+                  {service.description}
+                </p>
+
+                {/* hover underline accent */}
+                <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary group-hover:w-full transition-all duration-500 ease-out" />
+              </Link>
+            </motion.div>
           ))}
         </div>
       </div>
