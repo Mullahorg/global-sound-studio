@@ -14,8 +14,8 @@ import { useTranslation } from "react-i18next";
 
 const navLinkDefs = [
   { idx: "01", labelKey: "nav.home", href: "/" },
-  { idx: "02", labelKey: "nav.studio", href: "/studio" },
-  { idx: "03", labelKey: "nav.beats", href: "/beats" },
+  { idx: "02", labelKey: "nav.beats", href: "/beats" },
+  { idx: "03", labelKey: "nav.services", href: "/services" },
   { idx: "04", labelKey: "nav.booking", href: "/booking" },
   { idx: "05", labelKey: "nav.contact", href: "/contact" },
 ];
