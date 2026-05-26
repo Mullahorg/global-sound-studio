@@ -57,61 +57,69 @@ export const Navbar = () => {
       {/* Top utility strip - disappears on scroll */}
       <div
         className={`hidden md:block border-b border-border/40 overflow-hidden transition-all duration-500 ${
-          isScrolled ? "h-0 opacity-0" : "h-7 opacity-100"
+          isScrolled ? "h-0 opacity-0" : "h-8 opacity-100"
         }`}
       >
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 h-7 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-          <span>Vol. 01 / Issue {new Date().getFullYear()}</span>
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 h-8 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+          <span className="flex items-center gap-3">
+            <span className="hidden lg:inline">Vol. 01 / Issue {new Date().getFullYear()}</span>
+            <span className="flex items-center gap-1" aria-hidden>
+              <span className="w-1.5 h-1.5 rounded-full bg-foreground" />
+              <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(140_60%_35%)]" />
+            </span>
+            <span className="text-foreground/70">Nairobi · KE</span>
+          </span>
           <div className="flex items-center gap-4 lg:gap-6">
-            <span>Nairobi · Worldwide</span>
+            <span className="hidden md:inline">Worldwide Delivery</span>
             <PageMetrics />
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
+        <div className="flex items-center justify-between gap-4 h-16 sm:h-[68px] md:h-[76px] lg:h-20">
           {/* Wordmark */}
-          <Link to="/" className="flex items-end gap-3 z-50 group">
+          <Link to="/" className="flex items-end gap-2.5 sm:gap-3 z-50 group shrink-0">
             {settings.site_logo && (
               <img
                 src={settings.site_logo}
                 alt={settings.site_name || "Logo"}
-                className="w-8 h-8 sm:w-9 sm:h-9 object-contain"
+                className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 object-contain"
                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/logo.png"; }}
               />
             )}
             <div className="relative">
-              <span className="block font-display font-semibold text-foreground text-sm sm:text-base md:text-lg tracking-[-0.04em] leading-none">
+              <span className="block font-display font-semibold text-foreground text-[15px] sm:text-base md:text-lg lg:text-xl tracking-[-0.045em] leading-none">
                 {settings.site_name?.split(" ")[0] || "WE"}
               </span>
-              <span className="hidden md:block font-mono text-[9px] uppercase tracking-[0.28em] text-muted-foreground mt-1">
+              <span className="hidden md:block font-mono text-[9px] lg:text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1.5">
                 {settings.site_name?.split(" ").slice(1).join(" ") || "Global Studio"}
               </span>
             </div>
-            <span className="hidden sm:block w-1.5 h-1.5 rounded-full bg-primary mb-1.5 group-hover:scale-150 transition-transform duration-500" />
+            <span className="hidden sm:block w-1.5 h-1.5 rounded-full bg-primary mb-2 group-hover:scale-150 transition-transform duration-500" />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1">
+          <div className="hidden lg:flex items-center gap-1 xl:gap-2">
             {navLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (
                 <Link
                   key={link.label}
                   to={link.href}
-                  className={`group/link relative px-3 xl:px-4 py-2 flex items-baseline gap-2 transition-colors ${
+                  className={`group/link relative px-3 xl:px-4 py-2.5 flex items-baseline gap-2 transition-colors ${
                     isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] opacity-50 group-hover/link:opacity-100 transition-opacity">
+                  <span className="font-mono text-[9px] xl:text-[10px] uppercase tracking-[0.22em] opacity-50 group-hover/link:opacity-100 transition-opacity">
                     {link.idx}
                   </span>
-                  <span className="text-[13px] xl:text-sm font-medium tracking-tight">{link.label}</span>
+                  <span className="text-[13px] xl:text-[14px] font-medium tracking-[-0.01em]">{link.label}</span>
                   {isActive && (
                     <motion.span
                       layoutId="nav-active"
-                      className="absolute inset-x-3 -bottom-px h-px bg-primary"
+                      className="absolute inset-x-3 -bottom-px h-[2px] bg-primary"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -121,7 +129,7 @@ export const Navbar = () => {
           </div>
 
           {/* Actions */}
-          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1">
+          <div className="hidden lg:flex items-center gap-1 xl:gap-1.5">
             <Button
               variant="ghost"
               size="icon"
@@ -184,13 +192,13 @@ export const Navbar = () => {
           </div>
 
           {/* Mobile Toggle */}
-          <div className="flex items-center gap-1 lg:hidden">
-            <ThemeToggle className="w-9 h-9 text-muted-foreground hover:text-foreground rounded-sm" />
+          <div className="flex items-center gap-0.5 sm:gap-1 lg:hidden">
+            <ThemeToggle className="w-9 h-9 text-muted-foreground hover:text-foreground rounded-sm hidden sm:inline-flex" />
             <LanguageToggle className="w-9 h-9 text-muted-foreground hover:text-foreground rounded-sm" />
             {user && <NotificationCenter />}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 text-foreground z-50 -mr-2 border border-border rounded-sm ml-1"
+              className="p-2 text-foreground z-50 border border-border rounded-sm ml-1 hover:bg-secondary transition-colors"
               aria-label={isOpen ? "Close menu" : "Open menu"}
             >
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
