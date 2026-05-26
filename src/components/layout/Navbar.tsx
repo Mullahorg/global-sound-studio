@@ -215,12 +215,19 @@ export const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 lg:hidden z-40 noise-overlay bg-background/100 backdrop-blur-2xl"
+            className="fixed inset-0 lg:hidden z-40 noise-overlay bg-background backdrop-blur-2xl overflow-y-auto"
             style={{ backgroundColor: "hsl(var(--background))" }}
           >
-            <div className="flex flex-col h-full pt-20 pb-8 px-6">
-              <div className="flex items-center justify-between mb-8 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                <span>Index / Menu</span>
+            <div className="flex flex-col min-h-full pt-24 pb-10 px-5 sm:px-8">
+              <div className="flex items-center justify-between mb-8 font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  Index / Menu
+                  <span className="flex items-center gap-0.5" aria-hidden>
+                    <span className="w-1 h-1 rounded-full bg-foreground" />
+                    <span className="w-1 h-1 rounded-full bg-destructive" />
+                    <span className="w-1 h-1 rounded-full bg-[hsl(140_60%_35%)]" />
+                  </span>
+                </span>
                 <PageMetrics />
               </div>
               <nav className="flex-1 space-y-0">
@@ -233,13 +240,13 @@ export const Navbar = () => {
                   >
                     <Link
                       to={link.href}
-                      className={`flex items-baseline gap-4 py-5 border-b border-border/40 transition-colors ${
+                      className={`group flex items-baseline gap-4 py-5 border-b border-border/40 transition-colors ${
                         location.pathname === link.href ? "text-primary" : "text-foreground"
                       }`}
                     >
-                      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">{link.idx}</span>
-                      <span className="display-headline text-2xl sm:text-3xl">{link.label}</span>
-                      <ArrowUpRight className="w-4 h-4 ml-auto text-muted-foreground" />
+                      <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground w-6">{link.idx}</span>
+                      <span className="display-headline text-[28px] sm:text-4xl tracking-[-0.035em]">{link.label}</span>
+                      <ArrowUpRight className="w-4 h-4 ml-auto text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                     </Link>
                   </motion.div>
                 ))}
