@@ -30,6 +30,7 @@ const services = [
     startingPrice: 500,
     turnaround: "3-7 days",
     popular: true,
+    bookingType: "production",
   },
   {
     id: "mixing",
@@ -40,6 +41,7 @@ const services = [
     startingPrice: 200,
     turnaround: "2-4 days",
     popular: false,
+    bookingType: "mixing",
   },
   {
     id: "mastering",
@@ -50,6 +52,7 @@ const services = [
     startingPrice: 100,
     turnaround: "1-2 days",
     popular: false,
+    bookingType: "mastering",
   },
   {
     id: "recording",
@@ -60,6 +63,7 @@ const services = [
     startingPrice: 150,
     turnaround: "Same day",
     popular: true,
+    bookingType: "recording",
   },
   {
     id: "beats",
@@ -70,6 +74,7 @@ const services = [
     startingPrice: 29.99,
     turnaround: "Instant",
     popular: false,
+    bookingType: null,
   },
   {
     id: "film",
@@ -80,6 +85,7 @@ const services = [
     startingPrice: 1000,
     turnaround: "5-14 days",
     popular: false,
+    bookingType: "production",
   },
 ];
 
