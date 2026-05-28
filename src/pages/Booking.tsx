@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { PageMeta } from "@/components/seo/PageMeta";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MpesaCheckoutDialog } from "@/components/payments/MpesaCheckoutDialog";
 import { logDatabaseError, logPaymentError, createLogger } from "@/lib/errorLogger";
