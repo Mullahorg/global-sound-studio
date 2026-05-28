@@ -10,7 +10,9 @@ import {
   Check,
   ArrowRight,
   Clock,
-  Star
+  Star,
+  Calendar,
+  ArrowUpRight
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -28,6 +30,7 @@ const services = [
     startingPrice: 500,
     turnaround: "3-7 days",
     popular: true,
+    bookingType: "production",
   },
   {
     id: "mixing",
@@ -38,6 +41,7 @@ const services = [
     startingPrice: 200,
     turnaround: "2-4 days",
     popular: false,
+    bookingType: "mixing",
   },
   {
     id: "mastering",
@@ -48,6 +52,7 @@ const services = [
     startingPrice: 100,
     turnaround: "1-2 days",
     popular: false,
+    bookingType: "mastering",
   },
   {
     id: "recording",
@@ -58,6 +63,7 @@ const services = [
     startingPrice: 150,
     turnaround: "Same day",
     popular: true,
+    bookingType: "recording",
   },
   {
     id: "beats",
@@ -68,6 +74,7 @@ const services = [
     startingPrice: 29.99,
     turnaround: "Instant",
     popular: false,
+    bookingType: null,
   },
   {
     id: "film",
@@ -78,6 +85,7 @@ const services = [
     startingPrice: 1000,
     turnaround: "5-14 days",
     popular: false,
+    bookingType: "production",
   },
 ];
 
@@ -199,6 +207,33 @@ const Services = () => {
                     <Clock className="w-4 h-4" />
                     {service.turnaround}
                   </div>
+                </div>
+
+                {/* Book CTA */}
+                <div className="mt-6 pt-6 border-t border-border/50">
+                  {service.bookingType ? (
+                    <Link
+                      to={`/booking?service=${service.bookingType}`}
+                      className="group/book inline-flex w-full items-center justify-between gap-4 px-4 py-3 border border-foreground bg-foreground text-background hover:bg-primary hover:border-primary hover:text-primary-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em]"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5" />
+                        Book a Session
+                      </span>
+                      <ArrowUpRight className="w-3.5 h-3.5 group-hover/book:translate-x-0.5 group-hover/book:-translate-y-0.5 transition-transform" />
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/beats"
+                      className="group/book inline-flex w-full items-center justify-between gap-4 px-4 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em] text-foreground"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Headphones className="w-3.5 h-3.5" />
+                        Browse Beats
+                      </span>
+                      <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover/book:opacity-100 transition-all" />
+                    </Link>
+                  )}
                 </div>
               </motion.div>
             ))}

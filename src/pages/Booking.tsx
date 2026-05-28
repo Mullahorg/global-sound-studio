@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { PageMeta } from "@/components/seo/PageMeta";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MpesaCheckoutDialog } from "@/components/payments/MpesaCheckoutDialog";
 import { logDatabaseError, logPaymentError, createLogger } from "@/lib/errorLogger";
@@ -66,10 +66,24 @@ const Booking = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Preselect session from query param after data loads
+  useEffect(() => {
+    const serviceParam = searchParams.get("service");
+    if (serviceParam && sessionTypes.length > 0 && !selectedSession) {
+      const match = sessionTypes.find(s => s.id === serviceParam || s.session_type === serviceParam);
+      if (match) {
+        setSelectedSession(match.id);
+        // Auto-advance to step 2 since session is preselected
+        setStep(2);
+      }
+    }
+  }, [sessionTypes, searchParams, selectedSession]);
 
   const fetchData = async () => {
     try {
