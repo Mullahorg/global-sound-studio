@@ -1,14 +1,15 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Music, Headphones, Radio, Video, Mic2, Sliders, ArrowUpRight } from "lucide-react";
+import { ServiceSamplePlayer } from "@/components/services/ServiceSamplePlayer";
 
 const services = [
-  { idx: "01", icon: Music, title: "Music Production", swahili: "Utengenezaji", description: "Full-scale production from concept to master, built around your sound." },
-  { idx: "02", icon: Sliders, title: "Mixing & Mastering", swahili: "Mchanganyo", description: "Radio-ready, streaming-optimized masters tuned for African and global ears." },
-  { idx: "03", icon: Radio, title: "Beat Licensing", swahili: "Leseni za Beats", description: "License exclusive and non-exclusive beats with transparent, flexible terms." },
-  { idx: "04", icon: Headphones, title: "Remote Sessions", swahili: "Vipindi vya Mbali", description: "Collaborate with Nairobi-based producers from anywhere in the world." },
-  { idx: "05", icon: Mic2, title: "Songwriting", swahili: "Uandishi wa Nyimbo", description: "Top-line writers and composers crafting your next breakout record." },
-  { idx: "06", icon: Video, title: "Sound for Film", swahili: "Sauti ya Filamu", description: "Original scores and post-production audio for film, TV and brand work." },
+  { idx: "01", icon: Music, title: "Music Production", swahili: "Utengenezaji", description: "Full-scale production from concept to master, built around your sound.", frequency: 220 },
+  { idx: "02", icon: Sliders, title: "Mixing & Mastering", swahili: "Mchanganyo", description: "Radio-ready, streaming-optimized masters tuned for African and global ears.", frequency: 277 },
+  { idx: "03", icon: Radio, title: "Beat Licensing", swahili: "Leseni za Beats", description: "License exclusive and non-exclusive beats with transparent, flexible terms.", frequency: 330 },
+  { idx: "04", icon: Headphones, title: "Remote Sessions", swahili: "Vipindi vya Mbali", description: "Collaborate with Nairobi-based producers from anywhere in the world.", frequency: 392 },
+  { idx: "05", icon: Mic2, title: "Songwriting", swahili: "Uandishi wa Nyimbo", description: "Top-line writers and composers crafting your next breakout record.", frequency: 440 },
+  { idx: "06", icon: Video, title: "Sound for Film", swahili: "Sauti ya Filamu", description: "Original scores and post-production audio for film, TV and brand work.", frequency: 523 },
 ];
 
 export const ServicesSection = () => {
@@ -79,6 +80,15 @@ export const ServicesSection = () => {
                 <p className="text-sm text-foreground/70 leading-relaxed max-w-xs">
                   {service.description}
                 </p>
+
+                {/* Audio preview */}
+                <div className="mt-6">
+                  <ServiceSamplePlayer
+                    id={`service-${service.idx}`}
+                    frequency={service.frequency}
+                    label={service.swahili}
+                  />
+                </div>
 
                 {/* hover underline accent */}
                 <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary group-hover:w-full transition-all duration-500 ease-out" />
