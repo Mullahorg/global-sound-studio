@@ -122,6 +122,8 @@ export const ServicesSection = () => {
           {services.map((service, index) => {
             const primary = lang === "sw" ? service.sw : service.en;
             const secondary = lang === "both" ? service.sw : null;
+            const bookLabel = lang === "en" ? "Book a Session" : lang === "sw" ? "Weka Nafasi" : "Book · Weka Nafasi";
+            const browseLabel = lang === "en" ? "Browse Beats" : lang === "sw" ? "Vinjari Beats" : "Browse · Vinjari";
             return (
             <motion.div
               key={service.idx}
@@ -129,17 +131,14 @@ export const ServicesSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.06, duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-              className="border-r border-b border-border"
+              className="border-r border-b border-border group relative"
             >
-              <Link
-                to="/services"
-                className="group relative block p-6 md:p-8 h-full transition-colors hover:bg-secondary/40 focus-visible:bg-secondary/40 outline-none"
-              >
+              <div className="relative block p-6 md:p-8 h-full transition-colors hover:bg-secondary/40 focus-visible:bg-secondary/40 outline-none">
                 {/* index + arrow row */}
-                <div className="flex items-start justify-between mb-8 md:mb-10">
+                <Link to="/services" className="flex items-start justify-between mb-8 md:mb-10">
                   <span className="editorial-index">{service.idx}</span>
                   <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-                </div>
+                </Link>
 
                 {/* icon */}
                 <div className="w-10 h-10 mb-6 flex items-center justify-center border border-border group-hover:border-primary group-hover:text-primary transition-colors">
@@ -177,9 +176,36 @@ export const ServicesSection = () => {
                   />
                 </div>
 
+                {/* Book CTA */}
+                <div className="mt-6">
+                  {service.bookingType ? (
+                    <Link
+                      to={`/booking?service=${service.bookingType}`}
+                      className="group/book inline-flex w-full items-center justify-between gap-4 px-4 py-3 border border-foreground bg-foreground text-background hover:bg-primary hover:border-primary hover:text-primary-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em]"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5" />
+                        {bookLabel}
+                      </span>
+                      <ArrowUpRight className="w-3.5 h-3.5 group-hover/book:translate-x-0.5 group-hover/book:-translate-y-0.5 transition-transform" />
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/beats"
+                      className="group/book inline-flex w-full items-center justify-between gap-4 px-4 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em] text-foreground"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Headphones className="w-3.5 h-3.5" />
+                        {browseLabel}
+                      </span>
+                      <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover/book:opacity-100 transition-all" />
+                    </Link>
+                  )}
+                </div>
+
                 {/* hover underline accent */}
                 <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary group-hover:w-full transition-all duration-500 ease-out" />
-              </Link>
+              </div>
             </motion.div>
             );
           })}
