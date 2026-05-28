@@ -10,7 +10,9 @@ import {
   Check,
   ArrowRight,
   Clock,
-  Star
+  Star,
+  Calendar,
+  ArrowUpRight
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
