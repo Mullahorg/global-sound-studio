@@ -8,22 +8,22 @@ import { cn } from "@/lib/utils";
 type Lang = "en" | "sw" | "both";
 
 const services = [
-  { idx: "01", icon: Music, frequency: 220,
+  { idx: "01", icon: Music, frequency: 220, bookingType: "production",
     en: { title: "Music Production", description: "Full-scale production from concept to master, built around your sound." },
     sw: { title: "Utengenezaji wa Muziki", description: "Utengenezaji kamili kutoka wazo hadi master, uliojengwa kuzunguka sauti yako." } },
-  { idx: "02", icon: Sliders, frequency: 277,
+  { idx: "02", icon: Sliders, frequency: 277, bookingType: "mixing",
     en: { title: "Mixing & Mastering", description: "Radio-ready, streaming-optimized masters tuned for African and global ears." },
     sw: { title: "Mchanganyo na Umaliziaji", description: "Masters tayari kwa redio na streaming, zilizoboreshwa kwa masikio ya Kiafrika na ulimwengu." } },
-  { idx: "03", icon: Radio, frequency: 330,
+  { idx: "03", icon: Radio, frequency: 330, bookingType: null,
     en: { title: "Beat Licensing", description: "License exclusive and non-exclusive beats with transparent, flexible terms." },
     sw: { title: "Leseni za Beats", description: "Pata leseni za beats za pekee na za pamoja kwa masharti wazi na rahisi." } },
-  { idx: "04", icon: Headphones, frequency: 392,
+  { idx: "04", icon: Headphones, frequency: 392, bookingType: "recording",
     en: { title: "Remote Sessions", description: "Collaborate with Nairobi-based producers from anywhere in the world." },
     sw: { title: "Vipindi vya Mbali", description: "Shirikiana na watayarishaji wa Nairobi ukiwa popote duniani." } },
-  { idx: "05", icon: Mic2, frequency: 440,
+  { idx: "05", icon: Mic2, frequency: 440, bookingType: "consultation",
     en: { title: "Songwriting", description: "Top-line writers and composers crafting your next breakout record." },
     sw: { title: "Uandishi wa Nyimbo", description: "Waandishi na watunzi bora wanaotengeneza wimbo wako utakaovuma." } },
-  { idx: "06", icon: Video, frequency: 523,
+  { idx: "06", icon: Video, frequency: 523, bookingType: "production",
     en: { title: "Sound for Film", description: "Original scores and post-production audio for film, TV and brand work." },
     sw: { title: "Sauti ya Filamu", description: "Muziki asilia na sauti ya baada ya utengenezaji kwa filamu, TV na chapa." } },
 ];
