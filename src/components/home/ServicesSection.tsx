@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Music, Headphones, Radio, Video, Mic2, Sliders, ArrowUpRight } from "lucide-react";
+import { Music, Headphones, Radio, Video, Mic2, Sliders, ArrowUpRight, Calendar } from "lucide-react";
 import { ServiceSamplePlayer } from "@/components/services/ServiceSamplePlayer";
 import { cn } from "@/lib/utils";
 
