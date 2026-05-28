@@ -208,7 +208,33 @@ const Services = () => {
                     {service.turnaround}
                   </div>
                 </div>
-              </motion.div>
+
+                {/* Book CTA */}
+                <div className="mt-6 pt-6 border-t border-border/50">
+                  {service.bookingType ? (
+                    <Link
+                      to={`/booking?service=${service.bookingType}`}
+                      className="group/book inline-flex w-full items-center justify-between gap-4 px-4 py-3 border border-foreground bg-foreground text-background hover:bg-primary hover:border-primary hover:text-primary-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em]"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5" />
+                        Book a Session
+                      </span>
+                      <ArrowUpRight className="w-3.5 h-3.5 group-hover/book:translate-x-0.5 group-hover/book:-translate-y-0.5 transition-transform" />
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/beats"
+                      className="group/book inline-flex w-full items-center justify-between gap-4 px-4 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em] text-foreground"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Headphones className="w-3.5 h-3.5" />
+                        Browse Beats
+                      </span>
+                      <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover/book:opacity-100 transition-all" />
+                    </Link>
+                  )}
+                </div>
             ))}
           </div>
         </section>
