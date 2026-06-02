@@ -14,10 +14,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Space Grotesk', 'sans-serif'],
+        sans: ['Fira Sans', 'system-ui', 'sans-serif'],
+        display: ['DM Serif Display', 'serif'],
+        serif: ['DM Serif Display', 'serif'],
         mono: ['IBM Plex Mono', 'monospace'],
-        editorial: ['Space Grotesk', 'sans-serif'],
+        editorial: ['DM Serif Display', 'serif'],
       },
       fontSize: {
         'display-xl': ['clamp(3.5rem, 11vw, 11rem)', { lineHeight: '0.9', letterSpacing: '-0.045em' }],
@@ -50,6 +51,14 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+        },
+        tertiary: {
+          DEFAULT: "hsl(var(--tertiary))",
+          foreground: "hsl(var(--tertiary-foreground))",
+        },
+        warm: {
+          DEFAULT: "hsl(var(--warm))",
+          foreground: "hsl(var(--warm-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
