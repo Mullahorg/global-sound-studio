@@ -10,11 +10,16 @@ import {
   X,
   Wand2,
   Crop,
-  FileImage
+  FileImage,
+  Type,
+  Phone,
+  Mail,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
@@ -56,22 +61,88 @@ export const BrandingPanel = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [primaryColor, setPrimaryColor] = useState<string>("#ea580c");
   const [savingColor, setSavingColor] = useState(false);
+  const [accentColor, setAccentColor] = useState<string>("#e84393");
+  const [savingIdentity, setSavingIdentity] = useState(false);
+  const [identity, setIdentity] = useState({
+    site_name: "",
+    studio_description: "",
+    hero_title: "",
+    hero_subtitle: "",
+    hero_badge: "",
+    contact_email: "",
+    contact_phone: "",
+  });
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase
         .from("platform_settings")
         .select("setting_key, setting_value")
-        .in("setting_key", ["site_logo", "primary_color"]);
+        .in("setting_key", [
+          "site_logo",
+          "primary_color",
+          "accent_color",
+          "site_name",
+          "studio_description",
+          "hero_title",
+          "hero_subtitle",
+          "hero_badge",
+          "contact_email",
+          "contact_phone",
+        ]);
       data?.forEach((row) => {
         if (row.setting_key === "site_logo" && row.setting_value) setLogoUrl(row.setting_value);
         if (row.setting_key === "primary_color" && row.setting_value) {
           // Stored as hex; if HSL triplet, convert back to a visual hex picker default
           if (row.setting_value.startsWith("#")) setPrimaryColor(row.setting_value);
         }
+        if (row.setting_key === "accent_color" && row.setting_value?.startsWith?.("#")) {
+          setAccentColor(row.setting_value);
+        }
+        const identityKeys = [
+          "site_name",
+          "studio_description",
+          "hero_title",
+          "hero_subtitle",
+          "hero_badge",
+          "contact_email",
+          "contact_phone",
+        ] as const;
+        if (row.setting_value && (identityKeys as readonly string[]).includes(row.setting_key)) {
+          setIdentity((prev) => ({ ...prev, [row.setting_key]: row.setting_value! }));
+        }
       });
     })();
   }, []);
+
+  const handleSaveIdentity = async () => {
+    setSavingIdentity(true);
+    try {
+      const rows = Object.entries(identity).map(([k, v]) => ({
+        setting_key: k,
+        setting_value: v,
+        setting_type: "string",
+        description: `Brand identity: ${k}`,
+      }));
+      rows.push({
+        setting_key: "accent_color",
+        setting_value: accentColor,
+        setting_type: "string",
+        description: "Secondary brand color (hex)",
+      });
+      for (const row of rows) {
+        await supabase
+          .from("platform_settings")
+          .upsert(row, { onConflict: "setting_key" });
+      }
+      toast({ title: "Brand identity saved", description: "Site-wide branding updated." });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Failed to save";
+      toast({ title: "Error", description: msg, variant: "destructive" });
+    } finally {
+      setSavingIdentity(false);
+    }
+  };
 
   const handleSaveColor = async () => {
     setSavingColor(true);
