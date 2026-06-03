@@ -210,18 +210,18 @@ export const UsersPanel = () => {
     }
   };
 
-  const getCountryFlag = (country: string | null) => {
-    const flags: Record<string, string> = {
-      kenya: "🇰🇪",
-      tanzania: "🇹🇿",
-      uganda: "🇺🇬",
-      nigeria: "🇳🇬",
-      "south africa": "🇿🇦",
-      ghana: "🇬🇭",
-      ethiopia: "🇪🇹",
-      rwanda: "🇷🇼",
+  const getCountryCode = (country: string | null) => {
+    const codes: Record<string, string> = {
+      kenya: "KE",
+      tanzania: "TZ",
+      uganda: "UG",
+      nigeria: "NG",
+      "south africa": "ZA",
+      ghana: "GH",
+      ethiopia: "ET",
+      rwanda: "RW",
     };
-    return flags[country?.toLowerCase() || ""] || "🌍";
+    return codes[country?.toLowerCase() || ""] || "—";
   };
 
   const filteredUsers = users.filter((u) => {
@@ -344,8 +344,12 @@ export const UsersPanel = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-lg mr-1">{getCountryFlag(user.country)}</span>
-                    <span className="capitalize text-sm">{user.country || "Unknown"}</span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] px-1.5 py-0.5 rounded border border-border text-muted-foreground">
+                        {getCountryCode(user.country)}
+                      </span>
+                      <span className="capitalize text-sm">{user.country || "Unknown"}</span>
+                    </span>
                   </TableCell>
                   <TableCell>{getRoleBadge(roles[user.id])}</TableCell>
                   <TableCell>{getUserBadge(user.badge) || <span className="text-muted-foreground">-</span>}</TableCell>

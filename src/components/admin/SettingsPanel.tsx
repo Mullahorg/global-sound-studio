@@ -515,12 +515,12 @@ export const SettingsPanel = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="KES">KES - Kenyan Shilling 🇰🇪</SelectItem>
-                        <SelectItem value="TZS">TZS - Tanzanian Shilling 🇹🇿</SelectItem>
-                        <SelectItem value="UGX">UGX - Ugandan Shilling 🇺🇬</SelectItem>
-                        <SelectItem value="NGN">NGN - Nigerian Naira 🇳🇬</SelectItem>
-                        <SelectItem value="ZAR">ZAR - South African Rand 🇿🇦</SelectItem>
-                        <SelectItem value="USD">USD - US Dollar 🇺🇸</SelectItem>
+                        <SelectItem value="KES">KES — Kenyan Shilling</SelectItem>
+                        <SelectItem value="TZS">TZS — Tanzanian Shilling</SelectItem>
+                        <SelectItem value="UGX">UGX — Ugandan Shilling</SelectItem>
+                        <SelectItem value="NGN">NGN — Nigerian Naira</SelectItem>
+                        <SelectItem value="ZAR">ZAR — South African Rand</SelectItem>
+                        <SelectItem value="USD">USD — US Dollar</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
