@@ -67,19 +67,19 @@ export function logError(
   
   switch (level) {
     case 'debug':
-      console.debug(`🔍 ${prefix}${actionPrefix}`, message, context?.metadata || '');
+      console.debug(`[DEBUG] ${prefix}${actionPrefix}`, message, context?.metadata || '');
       break;
     case 'info':
-      console.info(`ℹ️ ${prefix}${actionPrefix}`, message, context?.metadata || '');
+      console.info(`[INFO] ${prefix}${actionPrefix}`, message, context?.metadata || '');
       break;
     case 'warn':
-      console.warn(`⚠️ ${prefix}${actionPrefix}`, message, context?.metadata || '');
+      console.warn(`[WARN] ${prefix}${actionPrefix}`, message, context?.metadata || '');
       break;
     case 'error':
-      console.error(`❌ ${prefix}${actionPrefix}`, message, stack || '', context?.metadata || '');
+      console.error(`[ERROR] ${prefix}${actionPrefix}`, message, stack || '', context?.metadata || '');
       break;
     case 'critical':
-      console.error(`🚨 CRITICAL ${prefix}${actionPrefix}`, message, stack || '', context?.metadata || '');
+      console.error(`[CRITICAL] ${prefix}${actionPrefix}`, message, stack || '', context?.metadata || '');
       break;
   }
 }
