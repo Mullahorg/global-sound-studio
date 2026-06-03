@@ -135,10 +135,10 @@ const Beats = () => {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8 p-4 sm:p-5 rounded-sm bg-secondary border border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+              className="mb-8 p-4 sm:p-5 rounded-3xl bg-secondary border border-border/60 shadow-soft flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-sm bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+                <div className="w-11 h-11 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
                   <Flame className="w-5 h-5 text-primary" />
                 </div>
                 <div>
@@ -149,7 +149,7 @@ const Beats = () => {
               <Button
                 variant="default"
                 onClick={() => setShowUploadDialog(true)}
-                className="rounded-sm font-mono text-[10px] uppercase tracking-[0.22em] h-11 px-5 w-full sm:w-auto shrink-0"
+                className="h-11 px-6 w-full sm:w-auto shrink-0"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Upload Beat
@@ -165,13 +165,13 @@ const Beats = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search beats or producers..."
-                className="pl-12 h-12 bg-secondary border-border rounded-sm"
+                className="pl-12 h-12 bg-secondary border-border rounded-full"
               />
             </div>
 
             <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3">
               <Select value={selectedGenre} onValueChange={(v) => setSelectedGenre(v as BeatGenre | "all")}>
-                <SelectTrigger className="sm:w-[160px] h-12 bg-secondary border-border rounded-sm">
+                <SelectTrigger className="sm:w-[160px] h-12 bg-secondary border-border rounded-full">
                   <Music2 className="w-4 h-4 mr-2" />
                   <SelectValue placeholder="Genre" />
                 </SelectTrigger>
@@ -185,7 +185,7 @@ const Beats = () => {
               </Select>
 
               <Select value={selectedMood} onValueChange={(v) => setSelectedMood(v as BeatMood | "all")}>
-                <SelectTrigger className="sm:w-[140px] h-12 bg-secondary border-border rounded-sm">
+                <SelectTrigger className="sm:w-[140px] h-12 bg-secondary border-border rounded-full">
                   <SlidersHorizontal className="w-4 h-4 mr-2" />
                   <SelectValue placeholder="Mood" />
                 </SelectTrigger>
@@ -201,7 +201,7 @@ const Beats = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="h-12 col-span-2 rounded-sm"
+                className="h-12 col-span-2"
                 onClick={() => setShowFilters(!showFilters)}
               >
                 <Filter className="w-4 h-4 mr-2" />
@@ -215,7 +215,7 @@ const Beats = () => {
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
-              className="mb-8 p-5 sm:p-6 rounded-sm bg-card border border-border"
+              className="mb-8 p-5 sm:p-6 rounded-3xl bg-card border border-border/60 shadow-soft"
             >
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground sm:w-24">BPM Range</span>
@@ -248,7 +248,7 @@ const Beats = () => {
 
           {/* Beats Grid */}
           {!loading && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 lg:gap-7">
               {beats.map((beat) => (
                 <BeatCard
                   key={beat.id}
@@ -262,7 +262,7 @@ const Beats = () => {
 
           {/* Empty State */}
           {!loading && beats.length === 0 && (
-            <div className="text-center py-16 sm:py-24 border border-dashed border-border rounded-sm">
+            <div className="text-center py-16 sm:py-24 border-2 border-dashed border-border rounded-3xl">
               <Music2 className="w-12 h-12 sm:w-16 sm:h-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="font-display text-xl sm:text-2xl font-semibold mb-2 tracking-tight">No beats found</h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto px-4">
@@ -271,7 +271,7 @@ const Beats = () => {
                   : "Be the first to upload a beat!"}
               </p>
               {isProducer && (
-                <Button variant="default" onClick={() => setShowUploadDialog(true)} className="rounded-sm font-mono text-[10px] uppercase tracking-[0.22em] h-11 px-5">
+                <Button variant="default" onClick={() => setShowUploadDialog(true)} className="h-11 px-6">
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Your First Beat
                 </Button>
