@@ -612,10 +612,26 @@ const Booking = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
               >
-                <h2 className="font-display text-2xl font-semibold mb-6">Confirm Booking</h2>
-                
-                <div className="bg-card rounded-xl border border-border/50 p-6 mb-6">
-                  <div className="space-y-4">
+                <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+                  <div>
+                    <h2 className="font-display text-2xl font-semibold flex items-center gap-2">
+                      <Receipt className="w-6 h-6 text-primary" />
+                      Instant Quote
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Quote <span className="font-mono">#{quoteNumber}</span> · Valid 14 days
+                    </p>
+                  </div>
+                  <Button variant="outline" onClick={handleDownloadQuote} className="gap-2">
+                    <FileDown className="w-4 h-4" />
+                    Download PDF
+                  </Button>
+                </div>
+
+                <div className="relative bg-card rounded-2xl border border-border/60 p-6 mb-6 overflow-hidden shadow-soft">
+                  <div aria-hidden className="absolute -top-16 -right-16 w-48 h-48 rounded-full opacity-20 blur-3xl"
+                       style={{ background: "var(--gradient-blaze)" }} />
+                  <div className="relative space-y-2">
                     <div className="flex items-center justify-between py-3 border-b border-border/50">
                       <span className="text-muted-foreground">Session Type</span>
                       <span className="font-semibold">{selectedSessionData?.name}</span>
@@ -640,9 +656,18 @@ const Booking = () => {
                       <span className="text-muted-foreground">Duration</span>
                       <span className="font-semibold">{selectedSessionData?.duration_hours} hours</span>
                     </div>
-                    <div className="flex items-center justify-between py-3">
-                      <span className="text-muted-foreground">Total</span>
-                      <span className="font-display font-bold text-2xl text-primary">
+                    <div className="flex items-center justify-between py-3 border-b border-border/50">
+                      <span className="text-muted-foreground">Hourly rate</span>
+                      <span className="font-mono text-sm">
+                        KES {(selectedSessionData?.price_kes || 0).toLocaleString()}/hr
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between mt-3 rounded-xl px-4 py-4 text-primary-foreground" style={{ background: "var(--gradient-blaze)" }}>
+                      <span className="font-medium flex items-center gap-2">
+                        <Sparkles className="w-4 h-4" />
+                        Total due
+                      </span>
+                      <span className="font-display font-bold text-2xl">
                         KES {totalPrice.toLocaleString()}
                       </span>
                     </div>
