@@ -114,12 +114,12 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="group relative bg-card border border-border overflow-hidden hover:border-primary/60 transition-colors duration-300 rounded-sm"
+      className="group relative bg-card border border-border/60 overflow-hidden hover:border-primary/40 hover:-translate-y-1 transition-all duration-500 rounded-[1.5rem] shadow-soft hover:shadow-card"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Editorial corner index */}
-      <div className="absolute top-3 left-3 z-20 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground bg-background/80 backdrop-blur-sm px-2 py-1 border border-border/60">
+      <div className="absolute top-3 left-3 z-20 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/80 bg-background/85 backdrop-blur-md px-2.5 py-1 rounded-full border border-border/60">
         {beat.bpm} BPM{beat.key ? ` · ${beat.key}` : ""}
       </div>
 
@@ -129,14 +129,14 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
       )}
 
       {/* Cover */}
-      <div className="relative aspect-square overflow-hidden bg-muted">
+      <div className="relative aspect-square overflow-hidden bg-muted rounded-t-[1.5rem]">
         <img
           src={beat.cover_url || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop"}
           alt={beat.title}
-          className="w-full h-full object-cover grayscale-[0.15] group-hover:grayscale-0 transition-all duration-500"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-background/40 group-hover:bg-background/20 transition-colors duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-background/10 to-transparent" />
 
         {/* Play Button */}
         <button
@@ -144,7 +144,7 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
           className="absolute inset-0 flex items-center justify-center opacity-100 sm:opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
           aria-label={isPlaying ? "Pause" : "Play"}
         >
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary flex items-center justify-center border border-primary-foreground/10">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform duration-300">
             {isPlaying ? (
               <Pause className="w-6 h-6 text-primary-foreground" />
             ) : (
@@ -159,8 +159,8 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
             onClick={handleToggleWishlist}
             aria-label={isLiked ? "Remove from wishlist" : "Add to wishlist"}
             className={cn(
-              "w-9 h-9 rounded-sm border border-border/70 flex items-center justify-center transition-colors",
-              "bg-background/85 backdrop-blur-sm",
+              "w-9 h-9 rounded-full border border-border/60 flex items-center justify-center transition-colors",
+              "bg-background/85 backdrop-blur-md",
               isLiked ? "text-primary border-primary/60" : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -169,7 +169,7 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
           <button
             onClick={handleAddToQueue}
             aria-label="Add to queue"
-            className="w-9 h-9 rounded-sm border border-border/70 flex items-center justify-center bg-background/85 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="w-9 h-9 rounded-full border border-border/60 flex items-center justify-center bg-background/85 backdrop-blur-md text-muted-foreground hover:text-foreground transition-colors"
           >
             <ListPlus className="w-4 h-4" />
           </button>
@@ -178,7 +178,7 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
         {/* Country (lucide pin, no emoji) */}
         {producerCountry && (
           <div className="absolute bottom-3 right-3 z-20">
-            <div className="flex items-center gap-1.5 bg-background/85 backdrop-blur-sm border border-border/70 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-foreground">
+            <div className="flex items-center gap-1.5 bg-background/85 backdrop-blur-md border border-border/60 rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-foreground">
               <MapPin className="w-3 h-3 text-primary" />
               {producerCountry}
             </div>
@@ -254,7 +254,7 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
 
         <Dialog open={showLicenseDialog} onOpenChange={setShowLicenseDialog}>
           <DialogTrigger asChild>
-            <Button variant="default" className="w-full mt-1 h-11 rounded-sm font-mono text-[10px] uppercase tracking-[0.22em]">
+            <Button variant="default" className="w-full mt-1 h-12">
               <ShoppingCart className="w-4 h-4 mr-2" />
               License This Beat
             </Button>
