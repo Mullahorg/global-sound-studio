@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { format, addDays, isSameDay, isAfter, startOfToday } from "date-fns";
-import { Calendar, Clock, User, ArrowRight, Check, ChevronLeft, ChevronRight, Smartphone, RefreshCw, Music2 } from "lucide-react";
+import { Calendar, Clock, User, ArrowRight, Check, ChevronLeft, ChevronRight, Smartphone, RefreshCw, Music2, FileDown, Receipt, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { MpesaCheckoutDialog } from "@/components/payments/MpesaCheckoutDialog";
 import { logDatabaseError, logPaymentError, createLogger } from "@/lib/errorLogger";
 import { DataIcon } from "@/lib/iconMap";
+import { downloadQuotePdf } from "@/lib/generateQuotePdf";
+import { usePlatformSettings } from "@/hooks/usePlatformSettings";
 
 const logger = createLogger("Booking");
 
@@ -67,6 +69,49 @@ const Booking = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { settings } = usePlatformSettings();
+  const quoteNumber = `Q-${Date.now().toString().slice(-8)}`;
+
+  const handleDownloadQuote = () => {
+    if (!selectedSessionData || !selectedDate || !selectedTime) {
+      toast({
+        title: "Add session details first",
+        description: "Pick a session, date and time to generate a quote.",
+        variant: "destructive",
+      });
+      return;
+    }
+    const hourly = selectedSessionData.price_kes;
+    const hours = selectedSessionData.duration_hours;
+    downloadQuotePdf({
+      brand: {
+        name: settings.site_name,
+        tagline: settings.studio_description,
+        email: settings.contact_email,
+        phone: settings.contact_phone,
+        primaryHex: settings.primary_color?.startsWith("#") ? settings.primary_color : "#ff6b35",
+      },
+      quoteNumber,
+      issuedAt: new Date(),
+      validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      clientName: user?.user_metadata?.full_name || user?.email || "Valued Client",
+      clientEmail: user?.email,
+      service: selectedSessionData.name,
+      items: [
+        { label: `${selectedSessionData.name} (${hours}h × KES ${hourly.toLocaleString()}/hr)`, value: `KES ${totalPrice.toLocaleString()}` },
+        { label: `Date: ${format(selectedDate, "EEEE, MMM d, yyyy")}`, value: selectedTime },
+        ...(selectedProducerData?.full_name ? [{ label: `Producer: ${selectedProducerData.full_name}`, value: "Assigned" }] : []),
+      ],
+      subtotal: totalPrice,
+      total: totalPrice,
+      currency: "KES",
+      notes: notes || "This quote is valid for 14 days. Sessions are confirmed upon M-Pesa payment.",
+    });
+    toast({
+      title: "Quote downloaded",
+      description: `Saved as quote-${quoteNumber}.pdf`,
+    });
+  };
 
   useEffect(() => {
     fetchData();
@@ -203,7 +248,7 @@ const Booking = () => {
         user_id: user.id,
         order_number: `WGME-${Date.now().toString().slice(-8)}`,
         amount: totalPrice,
-        license_type: defaultLicenseType, // ✅ Use valid license type
+        license_type: defaultLicenseType,
         status: "pending",
         created_at: new Date().toISOString(),
       };
