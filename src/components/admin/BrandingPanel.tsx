@@ -219,8 +219,8 @@ export const BrandingPanel = () => {
     >
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-2xl font-semibold">Branding</h2>
-          <p className="text-muted-foreground">Manage site logo with cropping, background removal & format export</p>
+          <h2 className="font-display text-2xl font-semibold">Full Site Branding</h2>
+          <p className="text-muted-foreground">Logo, colors, identity, hero copy and contact details — all in one place.</p>
         </div>
       </div>
 
@@ -394,33 +394,51 @@ export const BrandingPanel = () => {
       <div className="p-6 rounded-xl bg-card border border-border/50">
         <div className="flex items-center gap-2 mb-6">
           <Palette className="w-5 h-5 text-primary" />
-          <h3 className="font-display text-lg font-semibold">Brand Color</h3>
+          <h3 className="font-display text-lg font-semibold">Brand Colors</h3>
         </div>
         <p className="text-sm text-muted-foreground mb-6">
-          The primary color is used site-wide for buttons, links, accents and the active nav state.
+          Primary drives buttons, links and the active nav state. Accent is used for highlights and gradient washes.
         </p>
 
-        <div className="grid sm:grid-cols-[auto_1fr_auto] items-end gap-4">
+        <div className="grid sm:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label>Pick</Label>
+            <Label>Primary</Label>
+            <div className="flex gap-3 items-center">
             <input
               type="color"
               value={primaryColor}
               onChange={(e) => setPrimaryColor(e.target.value)}
-              className="w-20 h-12 rounded-md border border-border bg-background cursor-pointer p-1"
+              className="w-16 h-11 rounded-md border border-border bg-background cursor-pointer p-1"
             />
+              <Input
+                value={primaryColor}
+                onChange={(e) => setPrimaryColor(e.target.value)}
+                placeholder="#ff6b35"
+              />
+            </div>
           </div>
           <div className="space-y-2">
-            <Label>Hex</Label>
-            <Input
-              value={primaryColor}
-              onChange={(e) => setPrimaryColor(e.target.value)}
-              placeholder="#ea580c"
-            />
+            <Label>Accent</Label>
+            <div className="flex gap-3 items-center">
+              <input
+                type="color"
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                className="w-16 h-11 rounded-md border border-border bg-background cursor-pointer p-1"
+              />
+              <Input
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                placeholder="#e84393"
+              />
+            </div>
           </div>
+        </div>
+
+        <div className="mt-6 flex justify-end">
           <Button onClick={handleSaveColor} disabled={savingColor} className="h-11">
             {savingColor ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
-            Save Color
+            Save Primary Color
           </Button>
         </div>
 
@@ -428,10 +446,94 @@ export const BrandingPanel = () => {
           <span className="text-xs text-muted-foreground">Preview:</span>
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-md border border-border" style={{ backgroundColor: primaryColor }} />
-            <Button style={{ backgroundColor: primaryColor, color: "#fff" }} className="rounded-sm">
+            <div className="w-10 h-10 rounded-md border border-border" style={{ backgroundColor: accentColor }} />
+            <Button style={{ background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})`, color: "#fff" }}>
               Sample Button
             </Button>
           </div>
+        </div>
+      </div>
+
+      {/* Site Identity */}
+      <div className="p-6 rounded-xl bg-card border border-border/50">
+        <div className="flex items-center gap-2 mb-6">
+          <Type className="w-5 h-5 text-primary" />
+          <h3 className="font-display text-lg font-semibold">Site Identity</h3>
+        </div>
+        <p className="text-sm text-muted-foreground mb-6">
+          Name, tagline, hero copy and contact details shown across the site.
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Site Name</Label>
+            <Input
+              value={identity.site_name}
+              onChange={(e) => setIdentity((p) => ({ ...p, site_name: e.target.value }))}
+              placeholder="WE Global"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2"><Sparkles className="w-3.5 h-3.5" />Hero Badge</Label>
+            <Input
+              value={identity.hero_badge}
+              onChange={(e) => setIdentity((p) => ({ ...p, hero_badge: e.target.value }))}
+              placeholder="Live from Nairobi"
+            />
+          </div>
+          <div className="md:col-span-2 space-y-2">
+            <Label>Studio Tagline</Label>
+            <Input
+              value={identity.studio_description}
+              onChange={(e) => setIdentity((p) => ({ ...p, studio_description: e.target.value }))}
+              placeholder="Professional music production studio"
+            />
+          </div>
+          <div className="md:col-span-2 space-y-2">
+            <Label>Hero Headline</Label>
+            <Input
+              value={identity.hero_title}
+              onChange={(e) => setIdentity((p) => ({ ...p, hero_title: e.target.value }))}
+              placeholder="Global Sound. One Studio."
+            />
+          </div>
+          <div className="md:col-span-2 space-y-2">
+            <Label>Hero Subtitle</Label>
+            <Textarea
+              value={identity.hero_subtitle}
+              onChange={(e) => setIdentity((p) => ({ ...p, hero_subtitle: e.target.value }))}
+              rows={3}
+              placeholder="A borderless ecosystem connecting artists, producers, labels, and brands…"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2"><Mail className="w-3.5 h-3.5" />Contact Email</Label>
+            <Input
+              type="email"
+              value={identity.contact_email}
+              onChange={(e) => setIdentity((p) => ({ ...p, contact_email: e.target.value }))}
+              placeholder="hello@weglobal.com"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2"><Phone className="w-3.5 h-3.5" />Contact Phone</Label>
+            <Input
+              value={identity.contact_phone}
+              onChange={(e) => setIdentity((p) => ({ ...p, contact_phone: e.target.value }))}
+              placeholder="+254 700 000 000"
+            />
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          <Button onClick={handleSaveIdentity} disabled={savingIdentity} className="h-11">
+            {savingIdentity ? (
+              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Check className="w-4 h-4 mr-2" />
+            )}
+            Save Identity
+          </Button>
         </div>
       </div>
     </motion.div>
