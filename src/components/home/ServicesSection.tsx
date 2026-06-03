@@ -117,55 +117,105 @@ export const ServicesSection = () => {
           </motion.div>
         </div>
 
-        {/* Services grid - editorial brutalist */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t border-l border-border">
+        {/* Services bento grid — Canva-style */}
+        <div className="grid grid-cols-1 sm:grid-cols-6 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 auto-rows-[minmax(0,auto)]">
           {services.map((service, index) => {
             const primary = lang === "sw" ? service.sw : service.en;
             const secondary = lang === "both" ? service.sw : null;
             const bookLabel = lang === "en" ? "Book a Session" : lang === "sw" ? "Weka Nafasi" : "Book · Weka Nafasi";
             const browseLabel = lang === "en" ? "Browse Beats" : lang === "sw" ? "Vinjari Beats" : "Browse · Vinjari";
+            // Bento sizing — featured tiles span more
+            const isFeatured = index === 0 || index === 3;
+            const isAccent = index === 1;
+            const spanClass = isFeatured
+              ? "sm:col-span-6 lg:col-span-8"
+              : isAccent
+              ? "sm:col-span-6 lg:col-span-4"
+              : "sm:col-span-3 lg:col-span-4";
+            // Alternating tile styles
+            const tileStyle = isFeatured
+              ? "bg-card border border-border/60"
+              : isAccent
+              ? "text-white border-0"
+              : "bg-card border border-border/60";
+            const accentBg = isAccent
+              ? { background: "var(--gradient-blaze)" }
+              : undefined;
             return (
             <motion.div
               key={service.idx}
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.06, duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-              className="border-r border-b border-border group relative"
+              transition={{ delay: index * 0.07, duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+              className={cn(
+                "bento-tile group relative p-6 md:p-8 flex flex-col",
+                spanClass,
+                tileStyle
+              )}
+              style={accentBg}
             >
-              <div className="relative block p-6 md:p-8 h-full transition-colors hover:bg-secondary/40 focus-visible:bg-secondary/40 outline-none">
+              {/* Ambient gradient wash on featured tiles */}
+              {isFeatured && (
+                <div
+                  aria-hidden
+                  className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-30 blur-3xl pointer-events-none"
+                  style={{ background: index === 0 ? "var(--gradient-blaze)" : "linear-gradient(135deg, hsl(var(--tertiary)), hsl(var(--accent)))" }}
+                />
+              )}
+
+              <div className="relative flex flex-col h-full">
                 {/* index + arrow row */}
-                <Link to="/services" className="flex items-start justify-between mb-8 md:mb-10">
-                  <span className="editorial-index">{service.idx}</span>
-                  <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                <Link to="/services" className="flex items-start justify-between mb-6">
+                  <span className={cn("font-mono text-[10px] uppercase tracking-[0.22em]", isAccent ? "text-white/70" : "text-muted-foreground/70")}>
+                    {service.idx}
+                  </span>
+                  <ArrowUpRight className={cn("w-5 h-5 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5", isAccent ? "text-white/80" : "text-muted-foreground group-hover:text-primary")} />
                 </Link>
 
-                {/* icon */}
-                <div className="w-10 h-10 mb-6 flex items-center justify-center border border-border group-hover:border-primary group-hover:text-primary transition-colors">
-                  <service.icon className="w-4 h-4" strokeWidth={1.5} />
+                {/* icon — soft pill */}
+                <div className={cn(
+                  "w-12 h-12 mb-5 rounded-2xl flex items-center justify-center transition-colors",
+                  isAccent
+                    ? "bg-white/15 backdrop-blur-sm text-white"
+                    : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground"
+                )}>
+                  <service.icon className="w-5 h-5" strokeWidth={2} />
                 </div>
 
                 {/* title */}
-                <h3 className="display-headline text-2xl md:text-[28px] text-foreground mb-1.5 group-hover:text-primary transition-colors">
+                <h3 className={cn(
+                  "display-headline mb-1.5 transition-colors",
+                  isFeatured ? "text-3xl md:text-4xl lg:text-5xl" : "text-2xl md:text-[26px]",
+                  isAccent ? "text-white" : "text-foreground group-hover:text-primary"
+                )}>
                   {primary.title}
                 </h3>
                 {secondary && (
-                  <p className="display-italic font-light text-base md:text-lg text-foreground/60 mb-3">
+                  <p className={cn(
+                    "display-italic font-light text-base md:text-lg mb-3",
+                    isAccent ? "text-white/75" : "text-foreground/60"
+                  )}>
                     {secondary.title}
                   </p>
                 )}
-                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/80 mb-4">
-                  {lang === "en" ? service.sw.title : lang === "sw" ? service.en.title : `${service.en.title} · ${service.sw.title}`}
-                </p>
 
-                <p className="text-sm text-foreground/70 leading-relaxed max-w-xs">
+                <p className={cn(
+                  "text-sm md:text-[15px] leading-relaxed max-w-md mt-2",
+                  isAccent ? "text-white/85" : "text-foreground/70"
+                )}>
                   {primary.description}
                 </p>
                 {secondary && (
-                  <p className="text-sm text-foreground/55 leading-relaxed max-w-xs mt-2 italic">
+                  <p className={cn(
+                    "text-sm leading-relaxed max-w-md mt-2 italic",
+                    isAccent ? "text-white/65" : "text-foreground/55"
+                  )}>
                     {secondary.description}
                   </p>
                 )}
+
+                <div className="flex-1" />
 
                 {/* Audio preview */}
                 <div className="mt-6">
@@ -176,35 +226,42 @@ export const ServicesSection = () => {
                   />
                 </div>
 
-                {/* Book CTA */}
-                <div className="mt-6">
+                {/* Book CTA — pill button */}
+                <div className="mt-5">
                   {service.bookingType ? (
                     <Link
                       to={`/booking?service=${service.bookingType}`}
-                      className="group/book inline-flex w-full items-center justify-between gap-4 px-4 py-3 border border-foreground bg-foreground text-background hover:bg-primary hover:border-primary hover:text-primary-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em]"
+                      className={cn(
+                        "group/book inline-flex w-full items-center justify-between gap-4 px-5 py-3.5 rounded-full font-semibold text-sm transition-all shadow-soft hover:shadow-card",
+                        isAccent
+                          ? "bg-white text-foreground hover:bg-white/95"
+                          : "bg-foreground text-background hover:bg-primary hover:text-primary-foreground"
+                      )}
                     >
                       <span className="flex items-center gap-2">
-                        <Calendar className="w-3.5 h-3.5" />
+                        <Calendar className="w-4 h-4" />
                         {bookLabel}
                       </span>
-                      <ArrowUpRight className="w-3.5 h-3.5 group-hover/book:translate-x-0.5 group-hover/book:-translate-y-0.5 transition-transform" />
+                      <ArrowUpRight className="w-4 h-4 group-hover/book:translate-x-0.5 group-hover/book:-translate-y-0.5 transition-transform" />
                     </Link>
                   ) : (
                     <Link
                       to="/beats"
-                      className="group/book inline-flex w-full items-center justify-between gap-4 px-4 py-3 border border-border hover:border-foreground transition-colors font-mono text-[11px] uppercase tracking-[0.22em] text-foreground"
+                      className={cn(
+                        "group/book inline-flex w-full items-center justify-between gap-4 px-5 py-3.5 rounded-full font-semibold text-sm transition-all border-2",
+                        isAccent
+                          ? "border-white/40 text-white hover:bg-white/15"
+                          : "border-foreground/15 text-foreground hover:border-foreground hover:bg-secondary"
+                      )}
                     >
                       <span className="flex items-center gap-2">
-                        <Headphones className="w-3.5 h-3.5" />
+                        <Headphones className="w-4 h-4" />
                         {browseLabel}
                       </span>
-                      <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover/book:opacity-100 transition-all" />
+                      <ArrowUpRight className="w-4 h-4 opacity-70 group-hover/book:opacity-100 transition-all" />
                     </Link>
                   )}
                 </div>
-
-                {/* hover underline accent */}
-                <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary group-hover:w-full transition-all duration-500 ease-out" />
               </div>
             </motion.div>
             );
